@@ -1,24 +1,17 @@
 # Raj Salonia — Portfolio Website
 
-Source archive of the live portfolio: **https://raj-salonia-portfolio.vercel.app/**
+Production: https://raj-salonia-portfolio.vercel.app/
 
-This site showcases the four projects on the résumé:
-- [RoofShift AI](https://github.com/rajsalonia/roofshift-ai)
-- [JudgeForge](https://github.com/rajsalonia/JudgeForge)
-- [CityGraph](https://github.com/rajsalonia/citygraph)
-- [BoloAI](https://github.com/rajsalonia/BoloAI)
+A static HTML/CSS/JavaScript portfolio for backend, cloud, and applied AI engineering. The site has four featured projects (RoofShift AI, JudgeForge, CityGraph, BoloAI), work experience, hackathon qualifications, skills, and contact information.
 
-## Structure
+## Local preview
 
-- `index.html`: self-contained static portfolio with CSS, interactions, responsive design and About before Projects.
-- [Résumé PDF](https://raj-salonia-portfolio.vercel.app/Raj_Salonia_Resume.pdf): hosted as a separate asset on Vercel.
+Open `index.html` in a browser or serve the directory with `python -m http.server 8000`. All project links are external; the résumé is provided as `Raj_Salonia_Resume.pdf`. No build or paid service is required.
 
-## Run locally
+## Publishing
 
-Open `index.html` in a browser. For PDF links to work when previewing locally, also download the résumé from the live site and save it as `Raj_Salonia_Resume.pdf` in the same folder.
+Deploy the directory as a static site on Vercel. Preserve the production project/domain `raj-salonia-portfolio.vercel.app`. Do not upload keys, local `.env` files, or credentials.
 
-## Publishing updates
+## Content accuracy
 
-The live Vercel project is `raj-salonia-portfolio`. **This GitHub folder is not yet linked to that project for automatic deployment.** A commit to this folder alone does not change the live website. To enable GitHub auto-deploy, connect `rajsalonia/rajsalonia` in the existing Vercel project's Settings → Git, use `portfolio-site` as the root directory, and set `main` as the production branch.
-
-This folder is intentionally separate from the GitHub profile's root `README.md`.
+Engineering metrics refer to documented test or simulated scenarios, not unqualified real-world production outcomes. Hackathon entries distinguish final round, Round 2 and participation; proof links can be added when available.
