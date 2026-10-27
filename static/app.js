@@ -28,6 +28,8 @@
     spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',
     trend:'<path d="m3 17 6-6 4 4 8-10m-7 0h7v7"/>', info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.1"/>',
     copy:'<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
+    eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
     send:'<path d="m22 2-7 20-4-9-9-4Z M11 13 22 2"/>', logout:'<path d="M9 3H4v18h5M10 12h11m-5-5 5 5-5 5"/>'
   };
   const icon = name => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.info}</svg>`;
@@ -73,19 +75,43 @@
     try { return await work(); }
     finally { button.innerHTML = original; button.disabled = false; button.removeAttribute('aria-busy'); }
   }
+  function refreshThemeControls() {
+    const light = document.documentElement.dataset.theme === 'light';
+    $$('[data-classic-theme]').forEach(button => {
+      button.setAttribute('aria-label', light ? 'Use dark theme' : 'Use light theme');
+      button.setAttribute('aria-pressed', String(light));
+    });
+  }
+  $$('[data-classic-theme]').forEach(button => button.addEventListener('click', () => {
+    const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem('career-theme', theme); } catch { /* Theme still works without storage. */ }
+    refreshThemeControls();
+  }));
+  refreshThemeControls();
   if ($('#login-form')) {
+    $('#password-visibility')?.addEventListener('click', event => {
+      const visible = $('#password').type === 'password';
+      $('#password').type = visible ? 'text' : 'password';
+      event.currentTarget.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+      event.currentTarget.setAttribute('aria-pressed', String(visible));
+    });
+    $('#password').addEventListener('input', () => {
+      $('#password').removeAttribute('aria-invalid');
+      $('#auth-error').textContent = '';
+    });
     $('#login-form').addEventListener('submit', async event => {
       event.preventDefault();
       await busy(event.submitter, async () => {
         try { await post('/api/login', {password:$('#password').value}); $('#password').value = ''; window.location.replace('/'); }
-        catch (error) { feedback('#auth-error', error.message, true); }
+        catch (error) { feedback('#auth-error', error.message, true); $('#password').setAttribute('aria-invalid','true'); $('#password').focus(); }
       }, 'Opening your workspace…');
     });
     return;
   }
 
   const STAGES = ['Discovered','Saved','Draft ready','Applied','Assessment','Interview','Offer','Rejected','Closed'];
-  const PAGE_TITLES = {overview:'Overview',radar:'Opportunity Radar',explore:'Explore opportunities',applications:'My applications',contacts:'Recruiter CRM',gmail:'Gmail & outreach',resume:'Resume vault',sources:'Career sources',settings:'Settings & integrations'};
+  const PAGE_TITLES = {overview:'Overview',radar:'Opportunity Radar',explore:'Explore opportunities',applications:'My applications',autoapply:'Auto-apply review',contacts:'Recruiter CRM',gmail:'Gmail & outreach',resume:'Resume vault',sources:'Career sources',settings:'Settings & integrations'};
   const state = {jobs:null,radar:null,radarCategory:'all',radarLimit:48,radarScanning:false,mailActivity:null,discoveryState:null,discoveryChecking:false,summary:null,alerts:null,contacts:null,caps:null,sources:null,sent:null,messages:null,gmailOutbox:null,page:'overview',limit:24,view:'board',refreshing:false};
   const options = (selected, stages = STAGES) => stages.map(stage => `<option${stage === selected ? ' selected' : ''}>${esc(stage)}</option>`).join('');
   $('#stage-filter').insertAdjacentHTML('beforeend', options(''));
@@ -369,9 +395,35 @@
       empty('No synced sent messages','Connect Gmail and choose Check replies to sync recent outgoing messages. Existing Opportunity OS sends will appear here.','send','',true);
   }
 
+  const automationBackupHref = $('#auto-export').getAttribute('href');
+  function setAutomationAvailability(available) {
+    $('#auto-prep').disabled = !available;
+    // Valid data below applies the existing profile/resume/consent gate.
+    $('#auto-run').disabled = true;
+    $$('#auto-settings-form [type=submit], #auto-profile-form [type=submit]').forEach(button => { button.disabled = !available; });
+    const backup = $('#auto-export');
+    if (available) {
+      backup.setAttribute('href', automationBackupHref);
+      backup.removeAttribute('aria-disabled');
+      backup.removeAttribute('tabindex');
+    } else {
+      backup.removeAttribute('href');
+      backup.setAttribute('aria-disabled', 'true');
+      backup.setAttribute('tabindex', '-1');
+    }
+  }
+  setAutomationAvailability(false);
   function renderAutomation() {
     const data=state.autoapply, node=$('#auto-queue');
-    if (!data) { $('#auto-overview').textContent='Queue is unavailable; check your database connection.'; return; }
+    setAutomationAvailability(Boolean(data));
+    if (!data) {
+      $('#auto-mode-badge').textContent = 'Unavailable';
+      $('#auto-mode-badge').className = 'badge warning';
+      $('#auto-overview').textContent = 'Queue is unavailable. Review your persistent database connection and retry.';
+      $('#auto-readiness').innerHTML = '<div class="readiness-item" style="grid-column:1 / -1"><span class="readiness-symbol">'+icon('info')+'</span><span><strong>Application readiness unavailable</strong><small>Profile, resume and authorization status could not be verified.</small></span><a href="#settings" class="text-link">Review setup →</a></div>';
+      node.innerHTML = empty('Application controls are unavailable','Check your database connection in Settings. Your saved records are preserved.','shield','',true);
+      return;
+    }
     const defaults=data.professional_defaults || {}, professional=data.professional_profile || {}, contact=data.profile_contact || {};
     const fieldValues={
       '#auto-first':contact.first_name || 'Raj', '#auto-last':contact.last_name || 'Salonia',
@@ -405,6 +457,15 @@
     const ready=counts.ready ?? tasks.filter(item=>item.status==='ready').length;
     const review=(counts.needs_review ?? tasks.filter(item=>item.status==='needs_review').length)+(counts.unknown ?? tasks.filter(item=>item.status==='unknown').length);
     $('#auto-overview').textContent=(data.task_summary?.total ?? tasks.length)+' queued (latest '+tasks.length+' displayed) · '+ready+' eligible · '+review+' need review · '+submitted+' confirmed submissions · '+ownerRecorded+' owner-recorded. Profile: '+(data.profile_ready?'approved':'not approved')+'. Employer key: '+(data.greenhouse_keys_configured?'configured':'not configured')+'. External schedule: '+(data.scheduled_trigger_configured?'configured':'not configured')+'.';
+    const readiness = [
+      ['Approved profile', data.profile_ready, 'Review profile'],
+      ['Original resume', data.resume_ready, 'Open resume vault'],
+      ['Employer authorization', data.greenhouse_keys_configured, 'Employer key required'],
+      ['Submission switch', r.enabled, 'Disabled by you']
+    ];
+    $('#auto-readiness').innerHTML = readiness.map(([label, ready, pending], index) =>
+      '<div class="readiness-item '+(ready?'is-ready':'needs-attention')+'"><span class="readiness-symbol">'+icon(ready?'check':'info')+'</span><span><strong>'+esc(label)+'</strong><small>'+esc(ready?'Ready':pending)+'</small></span>'+(index===1&&!ready?'<a href="#resume" class="text-link">Open →</a>':'')+'</div>'
+    ).join('');
     const historyFilter=$('#auto-history-filter').value;
     const visibleTasks=historyFilter==='all' ? tasks : tasks.filter(item=>item.status===historyFilter);
     node.innerHTML=visibleTasks.length ? visibleTasks.slice(0,80).map(item=>{
@@ -419,8 +480,8 @@
       const receipt=item.receipt ? '<small>'+(item.status==='user_reported'?'Owner-provided reference: ':'Employer confirmation: ')+esc(item.receipt)+'</small>' : '';
       const when=item.attempted_at ? '<small>Attempted: '+esc(shortTime(item.attempted_at))+'</small>' : '';
       const submitted=item.status==='submitted' ? '<span class="badge positive">API-confirmed submission</span>' : (item.status==='user_reported' ? '<span class="badge">Owner-recorded, not API-verified</span>' : '');
-      return '<article class="automation-task"><div><strong>'+title+'</strong><p>'+esc(item.location || 'Location unconfirmed')+' · '+esc(item.provider || 'Other ATS')+' · '+esc(item.score)+'% estimated match</p><small>'+status+(reason ? ' — '+reason : '')+'</small>'+receipt+when+submitted+'</div><div class="automation-task-actions">'+open+pack+approve+manual+'</div></article>';
-    }).join('') : '<p class="muted">No applications in this view. Choose All applications or refresh eligible opportunities.</p>';
+      return '<article class="automation-task" data-status="'+esc(item.status || '')+'"><div class="automation-task-copy"><span class="automation-status badge">'+status+'</span><strong>'+title+'</strong><p>'+esc(item.location || 'Location unconfirmed')+' · '+esc(item.provider || 'Other ATS')+' · '+esc(item.score)+'% estimated match</p><small>'+status+(reason ? ' — '+reason : '')+'</small>'+receipt+when+submitted+'</div><div class="automation-task-actions">'+open+pack+approve+manual+'</div></article>';
+    }).join('') : empty('Your review queue is clear','Prepare eligible opportunities to start a reviewed application, or choose another history filter.','shield');
   }
   $('#auto-history-filter').addEventListener('change',renderAutomation);
   async function reloadAutomation() {
@@ -708,7 +769,7 @@
   $('#radar-categories').addEventListener('click',event=>{
     const b=event.target.closest('[data-radar-category]');if(!b)return;
     state.radarCategory=b.dataset.radarCategory;state.radarLimit=48;
-    $('#radar-categories button').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active));});
+    $$('#radar-categories button').forEach(x=>{const active=x===b;x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active));});
     renderRadar();
   });
   $('#radar-show-more').addEventListener('click',()=>{state.radarLimit+=60;renderRadar();});
@@ -812,7 +873,7 @@
       const results = await Promise.allSettled(requests.map(async ([key,path,extract]) => { state[key] = extract(await api(path)); }));
       const failures = results.flatMap((result,index) => result.status === 'rejected' ? [`${requests[index][0]}: ${result.reason.message}`] : []);
       if (failures.length) {
-        $('#load-error').hidden = false; $('#load-error-message').textContent = failures.join(' ');
+        $('#load-error').hidden = false; $('#load-error strong').textContent = state.jobs ? 'Some workspace tools need attention' : 'We couldn’t load your workspace'; $('#load-error-message').textContent = failures.join(' ');
         if (!state.jobs) { $('#jobs-list').innerHTML = empty('Your opportunities couldn’t load','Retry after checking your connection or database configuration.','info'); $('#jobs-list').setAttribute('aria-busy','false'); $('#results-count').textContent = 'Unable to load opportunities'; }
         if (!state.caps) { $('#gmail-status').textContent = 'Integration status is unavailable. Retry the connection check.'; $('#settings-integrations').innerHTML = empty('Status unavailable','Check your database connection and retry.','info'); }
       }

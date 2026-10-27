@@ -1,0 +1,45 @@
+/* Aurora Glass — shared materials, type and rhythm. Local fonts keep sign-in private. */
+:root {
+  --aurora-font:Inter,'Segoe UI',system-ui,sans-serif;
+  --aurora-bg:#0c101b;
+  --aurora-surface:#141a28;
+  --aurora-surface-raised:#1b2233;
+  --aurora-text:#f1f3fb;
+  --aurora-muted:#a0acc4;
+  --aurora-line:#ffffff12;
+  --aurora-accent:#b5a5ff;
+  --aurora-accent-soft:#9380ff17;
+  --aurora-success:#8bd7b5;
+  --aurora-warning:#e8c184;
+  --aurora-danger:#ffa8b6;
+  --aurora-shadow:0 16px 48px #00000024;
+  --aurora-glass:#121826e8;
+  --aurora-primary:#7152d2;
+  --aurora-focus:#b8a8ff;
+  --aurora-radius:16px;
+  --aurora-space-1:4px;
+  --aurora-space-2:8px;
+  --aurora-space-3:12px;
+  --aurora-space-4:16px;
+  --aurora-space-6:24px;
+  --aurora-space-8:32px;
+  --aurora-fast:160ms;
+  color-scheme:dark;
+}
+:root[data-theme=light] {
+  --aurora-bg:#f2f3f8;
+  --aurora-surface:#ffffff;
+  --aurora-surface-raised:#f7f8fc;
+  --aurora-text:#242a3d;
+  --aurora-muted:#626e86;
+  --aurora-line:#25335c1c;
+  --aurora-accent:#6543c5;
+  --aurora-accent-soft:#7558da0d;
+  --aurora-success:#237958;
+  --aurora-warning:#8c601c;
+  --aurora-danger:#b53e57;
+  --aurora-shadow:0 12px 40px #2735500a;
+  --aurora-glass:#fcfcffe8;
+  --aurora-focus:#6849cc;
+  color-scheme:light;
+}
