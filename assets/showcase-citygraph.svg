@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="250" viewBox="0 0 560 250" role="img" aria-label="CITYGRAPH: Infrastructure risk and resilient routing"><title>CITYGRAPH</title>
+<defs><linearGradient id="cardbg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111c24"/><stop offset="1" stop-color="#0b181b"/></linearGradient><pattern id="g" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" fill="none" stroke="#35534d" stroke-opacity=".18"/></pattern><clipPath id="clip"><rect x="1" y="1" width="558" height="248" rx="13"/></clipPath><style>.trace{animation:trace 7s linear infinite}.pulse{animation:pulse 4s ease-in-out infinite}@keyframes trace{to{stroke-dashoffset:-150}}@keyframes pulse{50%{opacity:.25}}@media(prefers-reduced-motion:reduce){.trace,.pulse{animation:none}}</style></defs>
+<g clip-path="url(#clip)"><rect width="560" height="250" fill="url(#cardbg)"/><rect width="560" height="250" fill="url(#g)"/><rect x="1" y="1" width="558" height="248" rx="13" stroke="#28483f" fill="none"/>
+<path d="M282 0V250" stroke="#28483f" stroke-opacity=".55"/>
+<text x="24" y="41" font-family="monospace" font-size="12" letter-spacing="1.9" fill="#91cafa">03 / GRAPH / GEOINTELLIGENCE</text>
+<text x="23" y="101" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" letter-spacing="-.8" fill="#eef8f4">CITYGRAPH</text>
+<foreignObject x="-100" y="-100" width="1" height="1"></foreignObject>
+<text x="24" y="138" font-family="Arial,Helvetica,sans-serif" font-size="14.5" fill="#b3c9bf">Infrastructure risk and resilient</text>
+<text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-size="14.5" fill="#b3c9bf">routing</text>
+<path d="M23 198H259" stroke="#315047"/>
+<text x="24" y="226" font-family="monospace" font-size="11" fill="#82a89a">NetworkX  /  FastAPI  /  GIS</text>
+<g stroke="#5a8fba" stroke-width="2" opacity=".9"><path d="M314 192 370 138 415 199 474 101 513 171 415 199 370 138 474 101 314 192 513 171" fill="none"/></g><g fill="#112a3b" stroke="#91cafa" stroke-width="2"><circle cx="314" cy="192" r="10"/><circle cx="370" cy="138" r="10"/><circle cx="415" cy="199" r="10"/><circle cx="474" cy="101" r="10"/><circle cx="513" cy="171" r="10"/></g><path class="trace" d="M314 192 370 138 474 101 513 171" stroke="#91cafa" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 9" fill="none"/><circle cx="474" cy="101" r="19" fill="#91cafa" fill-opacity=".08" class="pulse"/>
+</g></svg>

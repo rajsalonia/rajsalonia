@@ -1,4 +1,4 @@
-name: Contribution animation
+name: Real contribution animation (green)
 on:
   workflow_dispatch:
   push:
@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: profile-animation
+  group: profile-activity-snake
   cancel-in-progress: false
 jobs:
   generate:
@@ -22,42 +22,28 @@ jobs:
         with:
           github_user_name: rajsalonia
           outputs: |
-            dist/snake.svg
-            dist/snake-dark.svg?palette=github-dark
-      - name: Validate generated assets
+            dist/snake.svg?color_snake=#2ea043&color_dots=#ebedf0,#9be9a8,#40c463,#30a14e,#216e39
+            dist/snake-dark.svg?color_snake=#39d353&color_dots=#161b22,#0e4429,#006d32,#26a641,#39d353
+      - name: Confirm generated SVGs
         run: |
           test -s dist/snake.svg
           test -s dist/snake-dark.svg
           grep -q '<svg' dist/snake.svg
           grep -q '<svg' dist/snake-dark.svg
-      - name: Publish assets and enable image only after success
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Publish contribution art (output branch only)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          cp -r dist "$RUNNER_TEMP/profile-snake"
+          mkdir -p "$RUNNER_TEMP/snake"
+          cp dist/*.svg "$RUNNER_TEMP/snake/"
           git fetch origin output || true
           if git show-ref --verify --quiet refs/remotes/origin/output; then
             git checkout -B output origin/output
           else
             git checkout --orphan output
-            git rm -rf .
+            git rm -rf . || true
           fi
-          cp "$RUNNER_TEMP/profile-snake/"*.svg .
+          cp "$RUNNER_TEMP/snake/"*.svg .
           git add snake.svg snake-dark.svg
-          git diff --cached --quiet || git commit -m "assets: refresh contribution animation"
-          git push origin output
-          git checkout main
-          git pull --ff-only origin main
-          python - <<'PY'
-          from pathlib import Path
-          p = Path("README.md")
-          s = p.read_text()
-          start, end = "<!-- SNAKE:START -->", "<!-- SNAKE:END -->"
-          image = '<picture>\n<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/rajsalonia/rajsalonia/output/snake-dark.svg">\n<img src="https://raw.githubusercontent.com/rajsalonia/rajsalonia/output/snake.svg" alt="Animated contribution graph — native activity link above provides a fallback" width="960">\n</picture>'
-          p.write_text(s[:s.index(start)+len(start)] + "\n" + image + "\n" + s[s.index(end):])
-          PY
-          git add README.md
-          git diff --cached --quiet || git commit -m "design: enable verified contribution animation"
-          git push origin main
+          if ! git diff --cached --quiet; then git commit -m "assets: refresh authentic GitHub activity"; fi
+          git push origin HEAD:output
