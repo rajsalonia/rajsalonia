@@ -4,6 +4,7 @@ These checks verify asset wiring and important accessibility contracts;
 they do not replace browser screenshot or interaction testing.
 """
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,18 +15,25 @@ def read(path: str) -> str:
 
 def test_workspace_loads_aurora_glass_after_base_styles():
     html = read("templates/workspace.html")
-    assert html.index("workspace.css") < html.index("glass.css")
-    assert 'href="/static/glass.css?v=4.0.0"' in html
-    assert 'id="primary-nav"' in html
-    assert 'id="content"' in html
-    assert 'id="detail-dialog"' in html
-    assert 'id="assistant-dialog"' in html
+    assert html.index("aurora-tokens.css") < html.index("workspace.css") < html.index("glass.css")
+    for asset in ("aurora-tokens.css", "workspace.css", "glass.css", "workspace.js"):
+        assert re.search(re.escape(asset) + r'\?v=5\.\d+\.\d+', html)
+    for identifier in ("primary-nav", "content", "detail-dialog", "assistant-dialog",
+                       "command-dialog", "command-input", "command-results", "sidebar-backdrop"):
+        assert f'id="{identifier}"' in html
     assert 'data-action="theme"' in html
-    assert 'aria-label="Find opportunities"' in html
+    assert 'data-action="collapse"' in html
+    assert 'data-action="close-menu"' in html
+    assert 'aria-label="Search or jump to… Ctrl K"' in html
+    assert 'aria-controls="sidebar"' in html
+    assert 'aria-labelledby="command-title"' in html
+    assert 'role="combobox"' in html and 'aria-controls="command-results"' in html
+    assert 'role="listbox"' in html
 
 
 def test_advanced_workspace_and_login_use_glass_styles():
     html = read("templates/index.html")
+    assert html.index("aurora-tokens.css") < html.index("filename='glass-classic.css'")
     assert html.index("filename='app.css'") < html.index("filename='glass-classic.css'")
     assert 'id="login-form"' in html
     assert 'id="main-content"' in html
@@ -33,29 +41,43 @@ def test_advanced_workspace_and_login_use_glass_styles():
 
 
 def test_design_system_covers_themes_breakpoints_and_accessibility():
-    css = read("static/glass.css")
-    assert ":root[data-theme=dark]" in css
-    assert "#content[data-page=today]" in css
-    assert ".workspace > main,.workspace > .workspace-footer" in css
-    assert "position:sticky" in css
-    assert "@media(max-width:700px)" in css
-    assert "@media(prefers-reduced-motion:reduce)" in css
-    assert "@media(prefers-contrast:more)" in css
-    assert "@supports not" in css
+    tokens = read("static/aurora-tokens.css")
+    styles = [tokens, read("static/workspace.css"), read("static/glass.css")]
+    css = "\n".join(styles)
+    for token in ("--aurora-bg", "--aurora-text", "--aurora-muted", "--aurora-accent",
+                  "--aurora-focus", "--aurora-font", "--aurora-radius", "--aurora-space-4"):
+        assert token in tokens
+    assert re.search(r'color-scheme\s*:\s*dark', tokens)
+    assert re.search(r'\[data-theme\s*=\s*[\'\"]?light', tokens)
+    assert re.search(r'color-scheme\s*:\s*light', tokens)
+    assert re.search(r'@media\s*\(\s*max-width\s*:\s*700px\s*\)', css)
+    assert re.search(r'prefers-reduced-motion\s*:\s*reduce', css)
+    assert re.search(r'prefers-contrast\s*:\s*more', css)
+    assert re.search(r'@supports\s+not[^\{]*backdrop-filter', css)
     assert "focus-visible" in css
-    assert css.count("{") == css.count("}")
+    for sheet in styles:
+        assert sheet.count("{") == sheet.count("}")
 
 
 def test_advanced_style_covers_login_dashboard_and_responsive_motion():
-    css = read("static/glass-classic.css")
+    css = read("static/app.css") + "\n" + read("static/glass-classic.css")
     for selector in (".login-layout", ".login-card", ".sidebar", ".topbar", ".job-card"):
         assert selector in css
-    assert "@media(max-width:760px)" in css
-    assert "@media(prefers-reduced-motion:reduce)" in css
+    assert re.search(r'@media\s*\(\s*max-width\s*:\s*(?:700|760)px\s*\)', css)
+    assert re.search(r'prefers-reduced-motion\s*:\s*reduce', css)
     assert css.count("{") == css.count("}")
 
 
-def test_navigation_tracks_active_view_for_hero():
-    script = read("static/workspace.js")
-    assert "$('#content').dataset.page=state.page" in script
-    assert "const ticket=++state.request;" in script
+def test_workspace_navigation_exposes_queue_and_analytics_in_rendered_shell():
+    from test_hosted import app
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session['owner'] = True
+    response = client.get('/')
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    for section in ('today', 'discover', 'saved', 'applications', 'queue', 'inbox',
+                    'calendar', 'analytics'):
+        assert re.search(r'href="#' + section + r'"[^>]*data-nav="' + section + r'"', html)
+    assert 'href="#content"' in html
+    assert 'id="content" tabindex="-1"' in html

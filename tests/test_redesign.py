@@ -264,8 +264,8 @@ def test_gmail_reply_matching_is_not_application_confirmation(monkeypatch):
 def test_workspace_assets_and_stage_filter_capabilities():
     client = signed_in()
     page = client.get('/').data.decode()
-    assert '/static/workspace.css?v=4.0.0' in page
-    assert '/static/workspace.js?v=4.0.0' in page
+    assert '/static/workspace.css?v=5.0.0' in page
+    assert '/static/workspace.js?v=5.0.0' in page
     # Verify script content provides stage filter pills and application table actions
     with open('static/workspace.js', 'r', encoding='utf-8') as sf:
         script = sf.read()
