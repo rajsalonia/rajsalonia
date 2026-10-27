@@ -209,12 +209,7 @@ def register(app,db,owner,check_origin,clock,cipher,token_table,legacy_token,goo
         service.invalidate();return service.model_status()
 
     @bp.get('/api/v3/analytics')
-    def analytics():
-        items=service.snapshot();stages={s:sum(r['stage']==s for r in items) for s in STAGES}
-        return {'opportunities':len(items),'stages':stages,'eligibility':{s:sum(r['eligibility']['code']==s for r in items) for s in ('eligible','likely','unknown','ineligible','closed')},
-          'owner_reported_submissions':store.rows('SELECT count(*) AS n FROM career_receipts')[0]['n'],
-          'audit_events':store.rows('SELECT count(*) AS n FROM career_history')[0]['n'],
-          'limitation':'Stage totals reflect current records, not conversion rates. Historical transitions and employer receipts were not consistently recorded before version 3.0.'}
+    def analytics():return run(service.analytics)
 
     @bp.get('/api/v3/export')
     def export():

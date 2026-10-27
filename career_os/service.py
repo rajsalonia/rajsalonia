@@ -26,6 +26,15 @@ DEFAULT_CHECKLIST = [
  ('After applying','Set an appropriate follow-up reminder'),('After applying','Review incoming recruiter messages'),
  ('After applying','Complete any invited assessment'),('After applying','Prepare for an interview if invited')]
 
+SKILL_FILTERS = {
+    'python': r'\bpython\b',
+    'fastapi': r'\bfastapi\b',
+    'backend': r'\bback[\s-]?end\b',
+    'ai': r'\b(?:generative[\s-]+ai|llms?|machine[\s-]+learning|ai[\s-]+engineer(?:ing)?|artificial[\s-]+intelligence)\b',
+    'cloud': r'\b(?:aws|cloud)\b',
+    'devops': r'\b(?:devops|sre|site[\s-]+reliability)\b',
+}
+
 class CareerService:
     def __init__(self, store, cipher=None):
         self.store, self.cipher = store, cipher
@@ -200,7 +209,8 @@ class CareerService:
     def filtered(self,query):
         items=self.snapshot();q=str(query.get('q','')).strip().lower()[:300]
         implicit={}
-        if re.search(r'\bpaid\b|\bstipend\b',q):implicit['paid']='yes'
+        if re.search(r'\bunpaid\b',q):implicit['paid']='no'
+        elif re.search(r'\bpaid\b|\bstipend\b',q):implicit['paid']='yes'
         if re.search(r'\bremote\b',q):implicit['mode']='Remote'
         elif re.search(r'\bhybrid\b',q):implicit['mode']='Hybrid'
         elif re.search(r'\bon[- ]?site\b|\bin[- ]?person\b',q):implicit['mode']='On-site'
@@ -210,8 +220,10 @@ class CareerService:
             if y in q:implicit['year']=y;break
         for category in ('hackathon','fellowship','scholarship','event','internship'):
             if category in q:implicit['type']=category
-        terms=[word for word in re.findall(r'[a-z0-9+#.]+',q) if word not in {'paid','stipend','remote','hybrid','onsite','person','in','india','delhi','ncr','2028','2027','2026','2025','accepting','graduates','graduating','students','for','me','show','the','a','an','and','internships','internship','hackathons','hackathon','jobs','opportunities','this','week','fellowships','fellowship','scholarships','scholarship','events','event','roles','role','batch'}]
+        terms=[word for word in re.findall(r'[a-z0-9+#.]+',q) if word not in {'paid','unpaid','stipend','remote','hybrid','onsite','person','in','india','delhi','ncr','2028','2027','2026','2025','accepting','graduates','graduating','students','for','me','show','the','a','an','and','internships','internship','hackathons','hackathon','jobs','opportunities','this','week','fellowships','fellowship','scholarships','scholarship','events','event','roles','role','batch'}]
         settings={**implicit,**{k:v for k,v in query.items() if v not in ('',None,'all')}}
+        skill=settings.get('skill')
+        if skill and skill not in SKILL_FILTERS:raise ValueError('Choose a supported skill filter.')
         result=[]
         for item in items:
             if item['dismissed'] and settings.get('view')!='dismissed':continue
@@ -231,6 +243,7 @@ class CareerService:
             if location=='india' and not re.search(r'\bindia\b|delhi|noida|gurgaon|gurugram|bengaluru|bangalore|hyderabad|pune|mumbai|chennai|kolkata',item.get('location') or '',re.I):continue
             if location=='ncr' and not re.search(r'delhi|noida|gurgaon|gurugram|\bncr\b|faridabad|ghaziabad',item.get('location') or '',re.I):continue
             if settings.get('paid')=='yes' and (not item['extracted']['fields']['compensation']['value'] or item['extracted']['fields']['compensation']['value']=='Unpaid'):continue
+            if settings.get('paid')=='no' and item['extracted']['fields']['compensation']['value']!='Unpaid':continue
             if settings.get('source') and settings['source'].lower() not in str(item.get('provider') or '').lower():continue
             if settings.get('year') and int(settings['year']) not in (item['extracted']['fields']['graduation_years']['value'] or []):continue
             deadline=item['extracted']['deadline']
@@ -241,6 +254,8 @@ class CareerService:
                 delta=(date.fromisoformat(target)-datetime.now(ZoneInfo('Asia/Kolkata')).date()).days
                 if not 0<=delta<={'today':0,'week':7,'month':30}[settings['deadline']]:continue
             skills_text=' '.join(item['extracted'].get('required_skills',[])+item['extracted'].get('preferred_skills',[]))
+            skill_evidence=' '.join((str(item.get('title') or ''),item['extracted']['description'],skills_text))
+            if skill and not re.search(SKILL_FILTERS[skill],skill_evidence,re.I):continue
             haystack=(str(item.get('title'))+' '+str(item.get('company'))+' '+item['extracted']['description']+' '+str(item.get('location'))+' '+str(item.get('category'))+' '+str(item.get('provider'))+' '+str(item['extracted']['work_mode'])+' '+skills_text).lower()
             if terms and not all(term in haystack for term in terms):continue
             result.append(item)
@@ -249,6 +264,49 @@ class CareerService:
         elif sort=='deadline':result.sort(key=lambda item:item['extracted']['deadline'].get('date') or '9999')
         elif sort=='company':result.sort(key=lambda item:str(item.get('company') or '').lower())
         return result,implicit
+
+    def analytics(self):
+        """Current record distributions and dated audit activity, without inferred outcomes."""
+        items=self.snapshot()
+        stages={stage:sum(item['stage']==stage for item in items) for stage in STAGES}
+        source_counts={};skill_counts={}
+        submitted_stages={'Applied','Assessment','Interview','Offer'}
+        for item in items:
+            name=str(item.get('provider') or item.get('source') or 'Owner-added source')
+            source=source_counts.setdefault(name,{'name':name,'total':0,'tracked':0,'submitted':0})
+            source['total']+=1
+            source['tracked']+=int(item['stage']!='Discovered')
+            source['submitted']+=int(item['stage'] in submitted_stages)
+            extracted=item['extracted']
+            # Count each skill once per opportunity even when both lists mention it.
+            skills={str(skill).strip().lower() for skill in extracted.get('required_skills',[])+extracted.get('preferred_skills',[]) if str(skill).strip()}
+            for skill in skills:skill_counts[skill]=skill_counts.get(skill,0)+1
+
+        local_zone=ZoneInfo('Asia/Kolkata')
+        now=datetime.fromisoformat(self.store.clock().replace('Z','+00:00'))
+        if now.tzinfo is None:now=now.replace(tzinfo=timezone.utc)
+        today=now.astimezone(local_zone).date();first_day=today-timedelta(days=13)
+        activity={(first_day+timedelta(days=offset)).isoformat():0 for offset in range(14)}
+        # A conservative date bound accommodates stored timestamps with different offsets.
+        history=self.store.rows('SELECT created_at FROM career_history WHERE created_at>=:since',{'since':(first_day-timedelta(days=1)).isoformat()})
+        for row in history:
+            try:
+                stamp=datetime.fromisoformat(str(row['created_at']).replace('Z','+00:00'))
+                if stamp.tzinfo is None:stamp=stamp.replace(tzinfo=timezone.utc)
+                day=stamp.astimezone(local_zone).date().isoformat()
+            except (TypeError,ValueError):continue
+            if day in activity and stamp<=now:activity[day]+=1
+        return {
+            'opportunities':len(items),'stages':stages,
+            'eligibility':{code:sum(item['eligibility']['code']==code for item in items) for code in ('eligible','likely','unknown','ineligible','closed')},
+            'owner_reported_submissions':self.store.rows('SELECT count(*) AS n FROM career_receipts')[0]['n'],
+            'audit_events':self.store.rows('SELECT count(*) AS n FROM career_history')[0]['n'],
+            'tracked':sum(item['stage']!='Discovered' for item in items),
+            'pending_review':sum(item['stage'] in {'Preparing','Researching','Ready to Apply'} for item in items),
+            'sources':sorted(source_counts.values(),key=lambda row:(-row['total'],row['name'].lower())),
+            'skills':[{'name':name,'count':count} for name,count in sorted(skill_counts.items(),key=lambda pair:(-pair[1],pair[0]))],
+            'activity':[{'date':day,'count':count} for day,count in activity.items()],
+            'limitation':'Stage totals and source totals reflect current records, not conversion rates. Historical transitions and employer receipts were not consistently recorded before version 3.0. Submitted source totals describe current Applied, Assessment, Interview and Offer stages; they do not imply independent employer receipts. Activity counts recorded audit events by Asia/Kolkata calendar day.'}
 
     def update(self,key,data):
         item=self.get(key)
