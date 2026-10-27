@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="286" viewBox="0 0 1200 286" role="img" aria-labelledby="title desc">
+<title id="title">Raj Salonia — Software Engineering</title>
+<desc id="desc">A refined dark engineering-themed banner with subtle animated data flows and backend system architecture.</desc>
+<defs>
+  <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101b2a"/><stop offset="0.57" stop-color="#0c1422"/><stop offset="1" stop-color="#101926"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#59ded7"/><stop offset="1" stop-color="#70a9fa"/></linearGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#83a3c1" stroke-opacity=".075" fill="none"/></pattern>
+  <clipPath id="corner"><rect x="1" y="1" width="1198" height="284" rx="18"/></clipPath>
+  <style>
+    .pulse{animation:pulse 4.4s ease-in-out infinite}
+    .draw{stroke-dasharray:7 13;animation:flow 10s linear infinite}
+    .blink{animation:blink 1.3s steps(1,end) infinite}
+    .float{animation:float 8s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+    @keyframes flow{to{stroke-dashoffset:-200}}
+    @keyframes blink{50%{opacity:0}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @media(prefers-reduced-motion:reduce){.pulse,.draw,.blink,.float{animation:none}}
+  </style>
+</defs>
+<g clip-path="url(#corner)">
+<rect width="1200" height="286" fill="url(#surface)"/>
+<rect width="1200" height="286" fill="url(#grid)"/>
+<path d="M0 0H1200" stroke="#5c86ac" stroke-opacity=".3"/>
+<path d="M0 285H1200" stroke="#5c86ac" stroke-opacity=".3"/>
+<path d="M30 0V286M1170 0V286" stroke="#6c90b7" stroke-opacity=".14"/>
+<rect x="52" y="38" width="5" height="12" rx="2" fill="#60ded4"/>
+<text x="69" y="48" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" letter-spacing="2.5" fill="#99b9ca">SOFTWARE ENGINEERING / 2026</text>
+<text x="53" y="133" font-family="Arial,Helvetica,sans-serif" font-size="67" font-weight="750" letter-spacing="-2.5" fill="#f2f7fc">RAJ SALONIA</text>
+<rect class="blink" x="530" y="93" width="5" height="46" fill="#59ded7" rx="2"/>
+<text x="56" y="170" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#b6c9d8">Backend systems <tspan fill="#62d8cd">/</tspan> Applied AI <tspan fill="#62d8cd">/</tspan> Cloud</text>
+<rect x="54" y="211" width="394" height="38" rx="19" fill="#142d39" stroke="#3d847f" stroke-opacity=".8"/>
+<circle class="pulse" cx="78" cy="230" r="5" fill="#66dec1"/>
+<text x="94" y="235" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#d4eeeb">Open to software engineering internships</text>
+<path d="M744 38V250" stroke="#54728b" stroke-opacity=".35"/>
+<g class="float">
+  <rect x="796" y="55" width="324" height="175" rx="15" fill="#121f30" stroke="#46647b" stroke-opacity=".75"/>
+  <rect x="818" y="78" width="107" height="42" rx="8" fill="#19374a" stroke="#3b8888"/>
+  <text x="871" y="96" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#9ac9cd">CLIENT</text>
+  <text x="871" y="112" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">request</text>
+  <rect x="989" y="78" width="107" height="42" rx="8" fill="#1a2f47" stroke="#4b719d"/>
+  <text x="1042" y="96" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#a9c1de">API</text>
+  <text x="1042" y="112" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">FastAPI</text>
+  <rect x="818" y="165" width="107" height="42" rx="8" fill="#1a2f47" stroke="#4b719d"/>
+  <text x="871" y="183" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#a9c1de">DATA</text>
+  <text x="871" y="199" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">pipelines</text>
+  <rect x="989" y="165" width="107" height="42" rx="8" fill="#19374a" stroke="#3b8888"/>
+  <text x="1042" y="183" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#9ac9cd">CLOUD</text>
+  <text x="1042" y="199" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">delivery</text>
+  <path d="M925 99H989M1042 120V165M989 186H925M871 165V120" stroke="#4f8fa0" stroke-width="2" fill="none"/>
+  <path class="draw" d="M925 99H989M1042 120V165M989 186H925M871 165V120" stroke="url(#accent)" stroke-width="2.7" fill="none"/>
+  <circle class="pulse" cx="989" cy="99" r="3.2" fill="#70d8d3"/>
+  <circle class="pulse" cx="1042" cy="165" r="3.2" fill="#70a9fa"/>
+</g>
+<rect y="280" width="1200" height="6" fill="url(#accent)"/>
+</g></svg>
