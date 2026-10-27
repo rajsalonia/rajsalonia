@@ -1,17 +1,21 @@
 <div align="center">
 
-<img src="assets/profile-hero-2026.svg" alt="Raj Salonia — backend systems, applied AI and cloud engineering. Open to software engineering internships." width="100%">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
+  <img src="assets/banner-dark.svg" alt="Raj Salonia — Software Engineering, Backend Architecture, Applied AI, Cloud Systems" width="100%">
+</picture>
 
 <br>
 
-**Software Engineer in the making — focused on building software that works beyond the demo.**
+**Software Engineer focused on Python backend architecture, high-throughput APIs, and practical AI systems.**
 
-Python backend · APIs & system design · Applied AI · Cloud fundamentals
+Python Backend · FastAPI &amp; System Design · Applied AI · Cloud Fundamentals
 
 <p>
-  <a href="https://raj-salonia-portfolio.vercel.app/"><img alt="Portfolio" src="https://img.shields.io/badge/Portfolio-Visit%20website-172A41?style=for-the-badge&logo=vercel&logoColor=white"></a>
-  <a href="https://www.linkedin.com/in/rajsalonia"><img alt="LinkedIn" src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"></a>
-  <a href="portfolio-site/Raj_Salonia_Resume.pdf"><img alt="Resume" src="https://img.shields.io/badge/Resume-View%20PDF-176B70?style=for-the-badge&logo=readme&logoColor=white"></a>
+  <a href="https://raj-salonia-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-Visit%20Website-111C2E?style=for-the-badge&logo=vercel&logoColor=56D6D0" alt="Portfolio"></a>
+  <a href="https://www.linkedin.com/in/rajsalonia"><img src="https://img.shields.io/badge/LinkedIn-Connect-111C2E?style=for-the-badge&logo=linkedin&logoColor=77AAEE" alt="LinkedIn"></a>
+  <a href="portfolio-site/Raj_Salonia_Resume.pdf"><img src="https://img.shields.io/badge/Resume-Download%20PDF-111C2E?style=for-the-badge&logo=googledocs&logoColor=56D6D0" alt="Resume"></a>
 </p>
 
 </div>
@@ -20,97 +24,114 @@ Python backend · APIs & system design · Applied AI · Cloud fundamentals
 
 ## About
 
-I'm a computer science undergraduate who enjoys turning ideas into working backend services and thoughtful developer-facing products. My work spans REST APIs, data pipelines, optimization, graph algorithms, and practical AI features.
+I am a computer science undergraduate at BPIT (GGSIPU), New Delhi (**Class of 2028**), specializing in backend software engineering, API architecture, and applied AI systems. I build backend services that prioritize correctness, defensive error handling, test coverage, and transparent data modeling over surface-level demos.
 
-- **Engineering focus:** Python, FastAPI, clean API contracts, testing, and maintainable services.
-- **Currently exploring:** distributed systems, AWS, Docker, CI/CD, and production-minded AI engineering.
-- **Background:** B.Tech Computer Science, BPIT (GGSIPU), New Delhi · **Class of 2028** · Software engineering internship experience (Apr–Jul 2026).
-- **Opportunities:** Open to software engineering, backend, applied AI, and cloud engineering internships.
+- **Backend Engineering:** Python, FastAPI, Pydantic, SQLite (WAL mode), asynchronous concurrency, and strict REST API design.
+- **Applied AI & Computation:** Graph algorithms, constrained budget optimization (MCKP), diurnal solar analytics, and domain-grounded agent orchestration.
+- **Cloud & Systems:** Docker containerization, AWS fundamentals (EC2, S3, CloudFront), Linux/Bash, and automated CI/CD pipelines via GitHub Actions.
+- **Opportunities:** Actively seeking **Software Engineering Internships** to contribute to production backend services, APIs, and computational infrastructure.
 
-## Selected work
+---
 
-Four projects that best represent how I approach different engineering problems. Each links to a public source repository.
+## Featured Engineering Projects
 
-### 01 / [RoofShift AI](https://github.com/rajsalonia/roofshift-ai) — optimization & energy intelligence
+Four production-style implementations demonstrating backend architecture, mathematical modeling, and defensive engineering.
 
-**Problem:** How do you prioritize rooftop solar investments when multiple buildings share a limited budget?
+### 01 / [RoofShift AI](https://github.com/rajsalonia/roofshift-ai) · Solar Modeling & Budget Optimization Platform
 
-Built a full-stack solar planning platform combining geospatial assessment, energy estimates, and **constrained portfolio budget optimization**. The system links physical assumptions to a decision workflow rather than just displaying dashboards.
+> **Geospatial rooftop solar assessment and capital allocation engine using operations research under fixed institutional budget limits.**
 
-`FastAPI` · `React` · `TypeScript` · `optimization` · `Docker`
+- **Problem Statement:** Multi-building organizations (university campuses, commercial facilities) face capital misallocation when evaluating rooftop solar due to siloed geospatial data, naive heuristics (e.g. simply selecting the largest roof), and inaccurate payback projections that ignore diurnal load coincidence.
+- **Engineering Solution:** Built an end-to-end solar intelligence platform integrating NASA POWER climatological irradiance, interactive GIS rooftop polygon extraction, diurnal generation-consumption coincidence modeling, and asset degradation diagnostics.
+- **Technical Differentiator:** Formulates multi-building rooftop capital allocation as a **Multiple-Choice Knapsack Problem (MCKP)** using a deterministic operations-research solver to maximize aggregate portfolio yield under hard budget ceilings.
+- **Technology Stack:** `Python 3.11+` · `FastAPI` · `React 18` · `TypeScript` · `Vite` · `Tailwind CSS` · `NASA POWER API` · `XGBoost` · `Docker Compose`
+- **Links & Evidence:** [GitHub Repository](https://github.com/rajsalonia/roofshift-ai) · [Live Demonstration](https://d2pxwgtcwn203c.cloudfront.net/) · [API Contracts](https://github.com/rajsalonia/roofshift-ai/blob/main/API_CONTRACTS.md)
 
-[Explore source & architecture](https://github.com/rajsalonia/roofshift-ai) · [Project demo](https://d2pxwgtcwn203c.cloudfront.net/)
+---
 
-### 02 / [JudgeForge](https://github.com/rajsalonia/JudgeForge) — backend design & reliable workflows
+### 02 / [JudgeForge](https://github.com/rajsalonia/JudgeForge) · Self-Hosted Fair Hackathon & Evaluation Engine
 
-**Problem:** How can hackathon teams submit projects and be evaluated fairly, with transparent rules and judge isolation?
+> **Resilient, zero-cloud-dependency hackathon management platform with server-enforced role isolation, statistical normalization, and cryptographic audit trails.**
 
-Developed a self-hosted workflow with role-based access, rubric scoring, **cross-judge score normalization**, audit trails, and CSV exports. Its repository documents automated acceptance and test checks.
+- **Problem Statement:** Competitive hackathons suffer from evaluator bias, score calibration variance across judges (strict vs. lenient), lack of judge isolation, and external cloud platform downtime during critical submission and judging windows.
+- **Engineering Solution:** Architected an offline-capable, single-server hackathon operations system with server-enforced role-based access control (`organizer`, `judge`, `participant`), peer review isolation (HTTP 403 on unauthorized peer inspections), rubric scoring anchors, and immutable audit logs.
+- **Technical Differentiator:** Implements **cross-judge Z-score standardization** ($z = \frac{x - \mu_j}{\sigma_j}$) rescaled to the 1.0–5.0 competition scale with zero-variance review protection ($\sigma_j = 0$), paired with offline-verifiable **Ed25519 digitally signed** judge records (`cryptography`).
+- **Technology Stack:** `Python 3.12` · `FastAPI` · `SQLite (WAL mode)` · `Pydantic` · `Docker` · `Ed25519 Cryptography` · `Pytest (80/80 passing)`
+- **Links & Evidence:** [GitHub Repository](https://github.com/rajsalonia/JudgeForge) · [Evaluation Demo](https://judgeforge.onrender.com/) · [Scoring Methodology](https://github.com/rajsalonia/JudgeForge/blob/main/JUDGING.md) · [Architecture Spec](https://github.com/rajsalonia/JudgeForge/blob/main/ARCHITECTURE.md)
 
-`Python` · `FastAPI` · `SQLite` · `RBAC` · `testing`
+---
 
-[Explore source & verification](https://github.com/rajsalonia/JudgeForge) · [Evaluation demo](https://judgeforge.onrender.com/)
+### 03 / [CityGraph](https://github.com/rajsalonia/citygraph) · Urban Infrastructure Risk Intelligence
 
-### 03 / [CityGraph](https://github.com/rajsalonia/citygraph) — graph algorithms & geospatial systems
+> **Graph-theoretic decision-support system simulating cascading infrastructure collapse and risk-weighted emergency routing during extreme weather.**
 
-**Problem:** How can interdependent city infrastructure failures be modeled and explored before they cascade?
+- **Problem Statement:** Urban critical infrastructure systems (stormwater pumping stations, power substations, arterial roads, and hospitals) are interdependent. Extreme climate stresses propagate failures across sectors, but conventional emergency dashboards only display static, isolated sensor maps.
+- **Engineering Solution:** Developed a graph-based simulation platform modeling Delhi infrastructure dependencies and historical flood events (e.g. July 2023 Yamuna flood), combining topological dependency graphs with spatial GIS overlays to visualize failure propagation and corridor vulnerabilities.
+- **Technical Differentiator:** Employs a **NetworkX graph dependency engine** to compute cascading stress propagation and solves **risk-weighted shortest paths** for emergency response teams that dynamically penalize flooded corridors and failed substation zones.
+- **Technology Stack:** `Python 3.11+` · `FastAPI` · `NetworkX` · `Shapely` · `React 19` · `Leaflet` · `Cytoscape.js` · `Vite` · `SQLite`
+- **Links & Evidence:** [GitHub Repository](https://github.com/rajsalonia/citygraph) · [Interactive Demo](https://citygraph-intelligence.vercel.app/) · [Architecture Spec](https://github.com/rajsalonia/citygraph#system-architecture)
 
-Created a graph-based decision-support prototype for **failure propagation**, flood-scenario exploration, map-based inspection, and risk-aware route planning using synthetic data.
+---
 
-`FastAPI` · `React` · `NetworkX` · `Leaflet` · `graph algorithms`
+### 04 / [BoloAI](https://github.com/rajsalonia/BoloAI) · Multilingual Voice-First Agentic Assistant & Verifier
 
-[Explore source & modeling approach](https://github.com/rajsalonia/citygraph) · [Project demo](https://citygraph-intelligence.vercel.app/)
+> **Voice-first agentic assistant engineered for Hindi, Hinglish, and English vernacular with conversational session memory, telephony adapters, and domain audit guardrails.**
 
-### 04 / [BoloAI](https://github.com/rajsalonia/BoloAI) — multilingual agent systems
+- **Problem Statement:** Conversational voice assistants frequently fail on Indic dialects, hallucinate unverified public benefits/scholarship information, and lack graceful degradation when telephony or external cloud APIs experience disruptions.
+- **Engineering Solution:** Engineered a voice-first agentic service supporting real-time streaming audio (8kHz L16 PCM WebSockets), multi-turn session context, and intent routing, designed with a clean abstraction layer separating live telephony (Exotel) and speech engines (Sarvam AI) from deterministic local mocks.
+- **Technical Differentiator:** Clean **architectural decoupling** of telecom and speech adapters from deterministic mock fallbacks, paired with an automated **official domain auditor (`.gov.in` / `.nic.in`)** that verifies claims before returning responses.
+- **Technology Stack:** `Python 3.10+` · `FastAPI` · `WebSockets` · `Sarvam AI (STT/TTS)` · `Exotel Telephony` · `Pydantic` · `Pytest (94 items)`
+- **Links & Evidence:** [GitHub Repository](https://github.com/rajsalonia/BoloAI) · [Hosted Demo](https://boloai-web.onrender.com/) · [Integration Status Matrix](https://github.com/rajsalonia/BoloAI#truthful-provider-status)
 
-**Problem:** How can digital assistance work naturally for Hindi, Hinglish, and English speakers?
+<sub>Hosted demos are lightweight evaluation instances. Repositories serve as the source of truth for architectural specifications, test fixtures, and verification commands.</sub>
 
-Built a voice-first assistant prototype with conversational context, intent-based tool orchestration, and configurable speech/telephony integrations. The code distinguishes real provider connections from mocked fallbacks.
+---
 
-`Python` · `FastAPI` · `agent orchestration` · `speech interfaces`
+## Technical Skills
 
-[Explore source & integration status](https://github.com/rajsalonia/BoloAI) · [Project demo](https://boloai-web.onrender.com/)
+Categorized by demonstrated hands-on engineering in source repositories versus active exploration.
 
-<sub>Hosted demos may vary in availability. Repositories are the source of truth for implementation details, setup instructions, and integration status.</sub>
+| Domain | Demonstrated in Projects | Active Exploration & Study |
+| :--- | :--- | :--- |
+| **Languages** | `Python (3.10–3.12)` · `TypeScript` · `JavaScript (ES6+)` · `SQL` | `C++` (Systems & Data Structures) |
+| **Backend & APIs** | `FastAPI` · `Pydantic` · `RESTful API Design` · `Uvicorn` · `SQLite (WAL mode)` · `WebSockets` · `RBAC` | Distributed Systems · PostgreSQL · Redis |
+| **AI & Computational Systems** | `Operations Research (MCKP)` · `NetworkX (Graph Algorithms)` · `scikit-learn` · `Agent Tool Orchestration` · `Speech Pipelines` | Multi-Agent Consensus · Vector Embeddings / RAG |
+| **Cloud & DevOps** | `Docker` · `Docker Compose` · `GitHub Actions (CI/CD)` · `AWS Fundamentals (EC2, S3, CloudFront)` · `Linux / Bash` | AWS Lambda · Terraform · Kubernetes |
+| **Engineering Practices** | `Automated Testing (Pytest)` · `Defensive Architecture` · `API Contract Verification` · `Ed25519 Cryptography` · `Audit Logging` | SRE Practices · Performance Profiling |
 
-## Engineering toolkit
+---
 
-| Domain | Technologies & practices |
-| :-- | :-- |
-| **Languages** | Python · TypeScript · JavaScript · SQL · C++ (learning) |
-| **Backend** | FastAPI · REST APIs · Pydantic · SQLAlchemy · SQLite · API design |
-| **Frontend** | React · Vite · Tailwind CSS (for full-stack project interfaces) |
-| **AI & data** | scikit-learn · NumPy · NetworkX · model/API integrations |
-| **Cloud & delivery** | Docker · Git · GitHub Actions · AWS fundamentals · CI/CD |
-| **Engineering habits** | Testing · reproducibility · documentation · failure handling |
+## Open-Source & Contribution Activity
 
-**More experiments:** [ReviewLens](https://github.com/rajsalonia/ReviewLens) (evidence-based comparisons) · [Proofly](https://github.com/rajsalonia/document-forgery-ai) (explainable document-risk checks).
+I use GitHub to maintain clean engineering hygiene: publishing reproducible code, writing automated test suites, documenting system constraints, and maintaining active deployment pipelines.
 
-## Open-source & GitHub activity
-
-I use GitHub to document decisions, publish implementations, and iterate on real projects. Browse my [public repositories](https://github.com/rajsalonia?tab=repositories), [contribution history](https://github.com/rajsalonia?tab=overview), or [GitHub achievements](https://github.com/rajsalonia?tab=achievements).
-
-<!-- SNAKE:START -->
 <div align="center">
+<!-- SNAKE:START -->
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/rajsalonia/rajsalonia/output/snake-dark.svg">
   <img src="https://raw.githubusercontent.com/rajsalonia/rajsalonia/output/snake.svg" alt="GitHub contribution activity represented as an animated snake. For accessible data, use the contribution history link above." width="900">
 </picture>
-</div>
 <!-- SNAKE:END -->
 
-<sub>Contribution animation reflects public GitHub activity. It is generated by a repository workflow, not a manually entered score.</sub>
+<sub>Contribution animation reflects public GitHub activity, automatically generated via scheduled GitHub Actions workflow.</sub>
+</div>
 
 ---
 
 <div align="center">
 
-### Interested in working together?
+<img src="assets/divider.svg" alt="" width="100%">
 
-I'm exploring internship opportunities where I can contribute to backend infrastructure, APIs, cloud services, or AI-enabled products — and learn from engineers building reliable software.
+### Connect & Collaborate
 
-[**Portfolio**](https://raj-salonia-portfolio.vercel.app/) · [**LinkedIn**](https://www.linkedin.com/in/rajsalonia) · [**Resume**](portfolio-site/Raj_Salonia_Resume.pdf)
+I am actively seeking **Software Engineering Internships** where I can contribute to backend services, API infrastructure, optimization problems, and practical AI applications.
 
-<sub>New Delhi, India · B.Tech CSE 2028</sub>
+<p>
+  <a href="https://raj-salonia-portfolio.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-Visit%20Website-111C2E?style=for-the-badge&logo=vercel&logoColor=56D6D0" alt="Portfolio"></a>
+  <a href="https://www.linkedin.com/in/rajsalonia"><img src="https://img.shields.io/badge/LinkedIn-Connect-111C2E?style=for-the-badge&logo=linkedin&logoColor=77AAEE" alt="LinkedIn"></a>
+  <a href="portfolio-site/Raj_Salonia_Resume.pdf"><img src="https://img.shields.io/badge/Resume-Download%20PDF-111C2E?style=for-the-badge&logo=googledocs&logoColor=56D6D0" alt="Resume PDF"></a>
+</p>
+
+<sub>New Delhi, India · B.Tech in Computer Science & Engineering (Class of 2028)</sub>
 
 </div>

@@ -1,56 +1,266 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="286" viewBox="0 0 1200 286" role="img" aria-labelledby="title desc">
-<title id="title">Raj Salonia — Software Engineering</title>
-<desc id="desc">A refined dark engineering-themed banner with subtle animated data flows and backend system architecture.</desc>
-<defs>
-  <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101b2a"/><stop offset="0.57" stop-color="#0c1422"/><stop offset="1" stop-color="#101926"/></linearGradient>
-  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#59ded7"/><stop offset="1" stop-color="#70a9fa"/></linearGradient>
-  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" stroke="#83a3c1" stroke-opacity=".075" fill="none"/></pattern>
-  <clipPath id="corner"><rect x="1" y="1" width="1198" height="284" rx="18"/></clipPath>
-  <style>
-    .pulse{animation:pulse 4.4s ease-in-out infinite}
-    .draw{stroke-dasharray:7 13;animation:flow 10s linear infinite}
-    .blink{animation:blink 1.3s steps(1,end) infinite}
-    .float{animation:float 8s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
-    @keyframes flow{to{stroke-dashoffset:-200}}
-    @keyframes blink{50%{opacity:0}}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-    @media(prefers-reduced-motion:reduce){.pulse,.draw,.blink,.float{animation:none}}
-  </style>
-</defs>
-<g clip-path="url(#corner)">
-<rect width="1200" height="286" fill="url(#surface)"/>
-<rect width="1200" height="286" fill="url(#grid)"/>
-<path d="M0 0H1200" stroke="#5c86ac" stroke-opacity=".3"/>
-<path d="M0 285H1200" stroke="#5c86ac" stroke-opacity=".3"/>
-<path d="M30 0V286M1170 0V286" stroke="#6c90b7" stroke-opacity=".14"/>
-<rect x="52" y="38" width="5" height="12" rx="2" fill="#60ded4"/>
-<text x="69" y="48" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" letter-spacing="2.5" fill="#99b9ca">SOFTWARE ENGINEERING / 2026</text>
-<text x="53" y="133" font-family="Arial,Helvetica,sans-serif" font-size="67" font-weight="750" letter-spacing="-2.5" fill="#f2f7fc">RAJ SALONIA</text>
-<rect class="blink" x="530" y="93" width="5" height="46" fill="#59ded7" rx="2"/>
-<text x="56" y="170" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#b6c9d8">Backend systems <tspan fill="#62d8cd">/</tspan> Applied AI <tspan fill="#62d8cd">/</tspan> Cloud</text>
-<rect x="54" y="211" width="394" height="38" rx="19" fill="#142d39" stroke="#3d847f" stroke-opacity=".8"/>
-<circle class="pulse" cx="78" cy="230" r="5" fill="#66dec1"/>
-<text x="94" y="235" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#d4eeeb">Open to software engineering internships</text>
-<path d="M744 38V250" stroke="#54728b" stroke-opacity=".35"/>
-<g class="float">
-  <rect x="796" y="55" width="324" height="175" rx="15" fill="#121f30" stroke="#46647b" stroke-opacity=".75"/>
-  <rect x="818" y="78" width="107" height="42" rx="8" fill="#19374a" stroke="#3b8888"/>
-  <text x="871" y="96" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#9ac9cd">CLIENT</text>
-  <text x="871" y="112" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">request</text>
-  <rect x="989" y="78" width="107" height="42" rx="8" fill="#1a2f47" stroke="#4b719d"/>
-  <text x="1042" y="96" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#a9c1de">API</text>
-  <text x="1042" y="112" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">FastAPI</text>
-  <rect x="818" y="165" width="107" height="42" rx="8" fill="#1a2f47" stroke="#4b719d"/>
-  <text x="871" y="183" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#a9c1de">DATA</text>
-  <text x="871" y="199" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">pipelines</text>
-  <rect x="989" y="165" width="107" height="42" rx="8" fill="#19374a" stroke="#3b8888"/>
-  <text x="1042" y="183" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#9ac9cd">CLOUD</text>
-  <text x="1042" y="199" text-anchor="middle" font-family="monospace" font-size="12" fill="#e3f4f7">delivery</text>
-  <path d="M925 99H989M1042 120V165M989 186H925M871 165V120" stroke="#4f8fa0" stroke-width="2" fill="none"/>
-  <path class="draw" d="M925 99H989M1042 120V165M989 186H925M871 165V120" stroke="url(#accent)" stroke-width="2.7" fill="none"/>
-  <circle class="pulse" cx="989" cy="99" r="3.2" fill="#70d8d3"/>
-  <circle class="pulse" cx="1042" cy="165" r="3.2" fill="#70a9fa"/>
-</g>
-<rect y="280" width="1200" height="6" fill="url(#accent)"/>
-</g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="280" viewBox="0 0 1200 280" role="img" aria-label="Raj Salonia — Software Engineering, Backend Architecture, Applied AI, Cloud Systems">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1220"/>
+      <stop offset="50%" stop-color="#111C2E"/>
+      <stop offset="100%" stop-color="#0B1220"/>
+    </linearGradient>
+
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#56D6D0"/>
+      <stop offset="100%" stop-color="#77AAEE"/>
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111C2E"/>
+      <stop offset="100%" stop-color="#0E1726"/>
+    </linearGradient>
+
+    <pattern id="techGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#28384C" stroke-opacity="0.28" stroke-width="0.8"/>
+      <circle cx="30" cy="30" r="0.8" fill="#28384C" fill-opacity="0.28"/>
+    </pattern>
+
+    <clipPath id="frameClip">
+      <rect x="1" y="1" width="1198" height="278" rx="16"/>
+    </clipPath>
+
+    <style>
+      .font-sans {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif;
+      }
+      .font-mono {
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      }
+
+      /* Terminal Cursor Blinking */
+      .cursor {
+        animation: cursorBlink 1.05s steps(2, start) infinite;
+      }
+      @keyframes cursorBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+
+      /* Data Stream Flow Animations */
+      .stream-right {
+        stroke-dasharray: 6 10;
+        animation: flowRight 2.4s linear infinite;
+      }
+      @keyframes flowRight {
+        to { stroke-dashoffset: -32; }
+      }
+
+      .stream-left {
+        stroke-dasharray: 6 10;
+        animation: flowLeft 2.4s linear infinite;
+      }
+      @keyframes flowLeft {
+        to { stroke-dashoffset: 32; }
+      }
+
+      .stream-down {
+        stroke-dasharray: 5 7;
+        animation: flowDown 1.8s linear infinite;
+      }
+      @keyframes flowDown {
+        to { stroke-dashoffset: -24; }
+      }
+
+      .stream-up {
+        stroke-dasharray: 5 7;
+        animation: flowUp 1.8s linear infinite;
+      }
+      @keyframes flowUp {
+        to { stroke-dashoffset: 24; }
+      }
+
+      /* Moving Data Packets */
+      .packet-h1 {
+        animation: packetH1 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes packetH1 {
+        0% { transform: translateX(0px); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateX(110px); opacity: 0; }
+      }
+
+      .packet-h2 {
+        animation: packetH2 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation-delay: 1.4s;
+      }
+      @keyframes packetH2 {
+        0% { transform: translateX(0px); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateX(-110px); opacity: 0; }
+      }
+
+      /* Status Indicator Pulse */
+      .pulse-ring {
+        animation: pulseRing 3.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        transform-origin: 64px 49px;
+      }
+      @keyframes pulseRing {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.6); opacity: 0; }
+        100% { transform: scale(0.95); opacity: 0; }
+      }
+
+      .pulse-dot {
+        animation: pulseDot 2.4s ease-in-out infinite;
+      }
+      @keyframes pulseDot {
+        0%, 100% { opacity: 0.85; }
+        50% { opacity: 1; }
+      }
+
+      /* Central Coordinator Glow */
+      .coord-pulse {
+        animation: coordPulse 2.8s ease-in-out infinite;
+      }
+      @keyframes coordPulse {
+        0%, 100% { r: 3.5px; opacity: 0.8; }
+        50% { r: 5px; opacity: 1; }
+      }
+
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        .cursor { animation: none; opacity: 1; }
+        .stream-right, .stream-left, .stream-down, .stream-up { animation: none; stroke-dasharray: none; }
+        .packet-h1, .packet-h2 { display: none; }
+        .pulse-ring { display: none; }
+        .pulse-dot, .coord-pulse { animation: none; opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <g clip-path="url(#frameClip)">
+    <rect width="1200" height="280" fill="url(#bgGrad)"/>
+    <rect width="1200" height="280" fill="url(#techGrid)"/>
+
+    <!-- Framing Grid Lines -->
+    <line x1="48" y1="0" x2="48" y2="280" stroke="#28384C" stroke-opacity="0.35" stroke-dasharray="3 6"/>
+    <line x1="576" y1="0" x2="576" y2="280" stroke="#28384C" stroke-opacity="0.35" stroke-dasharray="3 6"/>
+    <line x1="1152" y1="0" x2="1152" y2="280" stroke="#28384C" stroke-opacity="0.35" stroke-dasharray="3 6"/>
+
+    <!-- Left Panel: Identity, Status and Terminal -->
+    <g transform="translate(48, 36)">
+      <rect width="276" height="26" rx="13" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+      <circle class="pulse-ring" cx="16" cy="13" r="7" fill="#56D6D0" fill-opacity="0.35"/>
+      <circle class="pulse-dot" cx="16" cy="13" r="4" fill="#56D6D0"/>
+      <text class="font-sans" x="32" y="17" fill="#56D6D0" font-size="10.5" font-weight="700" letter-spacing="1.2">SYSTEM STATUS: AVAILABLE</text>
+      <text class="font-mono" x="206" y="17" fill="#94A3B8" font-size="9.5">/ B.TECH '28</text>
+    </g>
+
+    <text class="font-sans" x="48" y="112" font-size="48" font-weight="800" letter-spacing="-1.2" fill="#F1F5F9">RAJ SALONIA</text>
+    
+    <rect class="cursor" x="414" y="74" width="4.5" height="42" rx="1.5" fill="#56D6D0"/>
+
+    <text class="font-sans" x="48" y="152" font-size="17" font-weight="600" fill="#94A3B8">
+      Backend Engineering <tspan fill="#56D6D0">/</tspan> Applied AI <tspan fill="#56D6D0">/</tspan> Cloud
+    </text>
+
+    <!-- Terminal Prompt Container -->
+    <g transform="translate(48, 184)">
+      <rect width="496" height="46" rx="8" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+      
+      <text class="font-mono" x="16" y="27" font-size="13" font-weight="700" fill="#56D6D0">$</text>
+      <text class="font-mono" x="34" y="27" font-size="12" fill="#F1F5F9">fastapi dev <tspan fill="#94A3B8">--workers 4</tspan> &amp;&amp; pytest -q</text>
+      
+      <rect x="376" y="11" width="104" height="24" rx="6" fill="#162238" stroke="#28384C" stroke-width="0.8"/>
+      <circle cx="390" cy="23" r="3" fill="#10B981"/>
+      <text class="font-mono" x="400" y="26.5" font-size="10.5" font-weight="700" fill="#10B981">200 OK</text>
+      <text class="font-mono" x="446" y="26.5" font-size="9" fill="#94A3B8">12ms</text>
+    </g>
+
+    <!-- Right Panel: Software Architecture Visualization -->
+    <g transform="translate(600, 28)">
+      <rect width="552" height="224" rx="12" fill="#111C2E" fill-opacity="0.85" stroke="#28384C" stroke-width="1"/>
+
+      <line x1="0" y1="36" x2="552" y2="36" stroke="#28384C" stroke-width="1"/>
+      
+      <rect x="16" y="12" width="6" height="12" rx="1.5" fill="#77AAEE"/>
+      <text class="font-sans" x="30" y="22" font-size="10.5" font-weight="700" letter-spacing="1.1" fill="#94A3B8">SYSTEM TOPOLOGY</text>
+      <text class="font-mono" x="146" y="22" font-size="9.5" fill="#94A3B8">/ 4 NODES VERIFIED</text>
+      
+      <text class="font-mono" x="536" y="22" text-anchor="end" font-size="10" font-weight="600" fill="#56D6D0">HIGH THROUGHPUT</text>
+
+      <!-- Interconnecting Bus and Data Streams -->
+      <line x1="200" y1="78" x2="330" y2="78" stroke="#28384C" stroke-width="2"/>
+      <line class="stream-right" x1="200" y1="78" x2="330" y2="78" stroke="url(#accentGrad)" stroke-width="2"/>
+      
+      <g class="packet-h1" transform="translate(200, 78)">
+        <circle cx="0" cy="0" r="3.5" fill="#56D6D0"/>
+      </g>
+
+      <line x1="422" y1="112" x2="422" y2="146" stroke="#28384C" stroke-width="2"/>
+      <line class="stream-down" x1="422" y1="112" x2="422" y2="146" stroke="url(#accentGrad)" stroke-width="2"/>
+
+      <line x1="330" y1="180" x2="200" y2="180" stroke="#28384C" stroke-width="2"/>
+      <line class="stream-left" x1="330" y1="180" x2="200" y2="180" stroke="url(#accentGrad)" stroke-width="2"/>
+      
+      <g class="packet-h2" transform="translate(330, 180)">
+        <circle cx="0" cy="0" r="3.5" fill="#77AAEE"/>
+      </g>
+
+      <line x1="110" y1="146" x2="110" y2="112" stroke="#28384C" stroke-width="2"/>
+      <line class="stream-up" x1="110" y1="146" x2="110" y2="112" stroke="url(#accentGrad)" stroke-width="2"/>
+
+      <!-- Central Coordinator Link Lines -->
+      <line x1="200" y1="78" x2="330" y2="180" stroke="#28384C" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="2 4"/>
+      <line x1="330" y1="78" x2="200" y2="180" stroke="#28384C" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="2 4"/>
+
+      <!-- Central Coordinator Diamond -->
+      <g transform="translate(265, 129)">
+        <rect x="-14" y="-14" width="28" height="28" rx="6" fill="#0E1726" stroke="#56D6D0" stroke-width="1" transform="rotate(45)"/>
+        <circle class="coord-pulse" cx="0" cy="0" r="4" fill="#56D6D0"/>
+      </g>
+
+      <!-- Node 1: Ingestion / API Gateway -->
+      <g transform="translate(18, 48)">
+        <rect width="182" height="64" rx="8" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="64" rx="2" fill="#77AAEE"/>
+        <circle cx="18" cy="18" r="3.5" fill="#56D6D0"/>
+        <text class="font-sans" x="28" y="21" font-size="9" font-weight="700" letter-spacing="0.8" fill="#77AAEE">API GATEWAY</text>
+        <text class="font-mono" x="16" y="42" font-size="13" font-weight="700" fill="#F1F5F9">FastAPI / REST</text>
+        <text class="font-mono" x="16" y="55" font-size="8.5" fill="#94A3B8">Contracts / Auth / Routing</text>
+      </g>
+
+      <!-- Node 2: Computation / Engine -->
+      <g transform="translate(330, 48)">
+        <rect width="204" height="64" rx="8" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="64" rx="2" fill="#56D6D0"/>
+        <circle cx="18" cy="18" r="3.5" fill="#56D6D0"/>
+        <text class="font-sans" x="28" y="21" font-size="9" font-weight="700" letter-spacing="0.8" fill="#56D6D0">COMPUTATION ENGINE</text>
+        <text class="font-mono" x="16" y="42" font-size="13" font-weight="700" fill="#F1F5F9">Optimization &amp; AI</text>
+        <text class="font-mono" x="16" y="55" font-size="8.5" fill="#94A3B8">MCKP / Graph / Agents</text>
+      </g>
+
+      <!-- Node 3: Data / Persistence -->
+      <g transform="translate(18, 146)">
+        <rect width="182" height="64" rx="8" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="64" rx="2" fill="#77AAEE"/>
+        <circle cx="18" cy="18" r="3.5" fill="#77AAEE"/>
+        <text class="font-sans" x="28" y="21" font-size="9" font-weight="700" letter-spacing="0.8" fill="#77AAEE">PERSISTENCE LAYER</text>
+        <text class="font-mono" x="16" y="42" font-size="13" font-weight="700" fill="#F1F5F9">SQLite WAL / Data</text>
+        <text class="font-mono" x="16" y="55" font-size="8.5" fill="#94A3B8">Pydantic / Audit Trails</text>
+      </g>
+
+      <!-- Node 4: Cloud & Delivery -->
+      <g transform="translate(330, 146)">
+        <rect width="204" height="64" rx="8" fill="#111C2E" stroke="#28384C" stroke-width="1"/>
+        <rect x="0" y="0" width="4" height="64" rx="2" fill="#56D6D0"/>
+        <circle cx="18" cy="18" r="3.5" fill="#56D6D0"/>
+        <text class="font-sans" x="28" y="21" font-size="9" font-weight="700" letter-spacing="0.8" fill="#56D6D0">CLOUD &amp; DELIVERY</text>
+        <text class="font-mono" x="16" y="42" font-size="13" font-weight="700" fill="#F1F5F9">AWS / Docker / CI</text>
+        <text class="font-mono" x="16" y="55" font-size="8.5" fill="#94A3B8">EC2 / Containers / Actions</text>
+      </g>
+    </g>
+
+    <rect x="0" y="276" width="1200" height="4" fill="url(#accentGrad)"/>
+  </g>
+
+  <rect x="0.5" y="0.5" width="1199" height="279" rx="16" fill="none" stroke="#28384C" stroke-width="1"/>
+</svg>
