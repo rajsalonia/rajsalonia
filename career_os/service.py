@@ -203,6 +203,9 @@ class CareerService:
     def get(self,key):
         if not re.fullmatch(r'[jr]:[a-f0-9]{32,64}',str(key)):raise ValueError('Invalid opportunity identifier.')
         item=next((item for item in self.snapshot() if key in item['related_keys']),None)
+        # A newly created record can reach another Gunicorn worker before its
+        # projection expires. Retry a valid missing key against current storage.
+        if item is None:item=next((item for item in self.snapshot(fresh=True) if key in item['related_keys']),None)
         if item is None:raise LookupError('Opportunity not found.')
         return item
 

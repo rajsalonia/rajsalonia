@@ -159,6 +159,13 @@ def headers(response):
  response.headers["X-Frame-Options"]="DENY"
  response.headers["Referrer-Policy"]="strict-origin-when-cross-origin"
  response.headers["Cache-Control"]="no-store"
+ # The classic tools and v3 workspace share records, including this worker's
+ # short-lived projection cache. Publish successful legacy writes immediately.
+ if 200<=response.status_code<300 and request.method in ("POST","PATCH","DELETE") and request.endpoint in (
+  "addjob","updatejob","deletejob","refresh","refresh_extended","restore_backup",
+  "auto_run","confirm_manual_submission","auto_schedule"):
+  career=app.extensions.get("career")
+  if career:career["service"].invalidate()
  return response
 @app.get("/")
 def homepage():
@@ -252,13 +259,14 @@ def addjob():
  check_origin();j=request.get_json(silent=True) or {}
  company=str(j.get("company","")).strip()[:150]; title=str(j.get("title","")).strip()[:200]
  link=str(j.get("url","")).strip()[:2000]; location=str(j.get("location",""))[:200]
+ description=str(j.get("description","") or "")[:12000]
  if not (company and title and secure_url(link)):return {"error":"Valid company, title and HTTPS application URL required"},422
- jid=hashlib.sha256(link.encode()).hexdigest()[:32];score,warning=rank(title,"",location)
+ jid=hashlib.sha256(link.encode()).hexdigest()[:32];score,warning=rank(title,description,location)
  with db.begin() as c:
   c.execute(text("""INSERT INTO jobs(id,company,title,location,url,provider,description,score,warnings,status,notes,deadline,discovered,updated)
-  VALUES(:id,:co,:ti,:lo,:ur,'manual','',:sc,:warn,'Saved',:notes,:dl,:ts,:ts)
+  VALUES(:id,:co,:ti,:lo,:ur,'manual',:description,:sc,:warn,'Saved',:notes,:dl,:ts,:ts)
   ON CONFLICT(id) DO UPDATE SET notes=excluded.notes, deadline=excluded.deadline"""),
-  {"id":jid,"co":company,"ti":title,"lo":location,"ur":link,"sc":score,"warn":warning,
+  {"id":jid,"co":company,"ti":title,"lo":location,"ur":link,"description":description,"sc":score,"warn":warning,
    "notes":str(j.get("notes",""))[:4000],"dl":str(j.get("deadline",""))[:40],"ts":now()})
  return {"ok":True,"id":jid}
 @app.patch("/api/jobs/<jid>")
