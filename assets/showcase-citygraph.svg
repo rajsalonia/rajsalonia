@@ -4,7 +4,6 @@
 <path d="M282 0V250" stroke="#28483f" stroke-opacity=".55"/>
 <text x="24" y="41" font-family="monospace" font-size="12" letter-spacing="1.9" fill="#91cafa">03 / GRAPH / GEOINTELLIGENCE</text>
 <text x="23" y="101" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" letter-spacing="-.8" fill="#eef8f4">CITYGRAPH</text>
-<foreignObject x="-100" y="-100" width="1" height="1"></foreignObject>
 <text x="24" y="138" font-family="Arial,Helvetica,sans-serif" font-size="14.5" fill="#b3c9bf">Infrastructure risk and resilient</text>
 <text x="24" y="158" font-family="Arial,Helvetica,sans-serif" font-size="14.5" fill="#b3c9bf">routing</text>
 <path d="M23 198H259" stroke="#315047"/>
