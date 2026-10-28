@@ -20,7 +20,7 @@ def test_draft_is_review_first():
     assert "FastAPI" in draft["body"]
     assert "whether" in draft["body"]
     assert draft["attach_original_resume"] is False
-    assert "not sent" in draft["warning"]
+    assert "no email was sent" in draft["warning"]
 
 def test_invalid_file_rejected():
     with pytest.raises(ValueError):
