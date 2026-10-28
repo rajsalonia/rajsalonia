@@ -661,7 +661,7 @@ def import_hr_contacts():
  with db.begin() as c:
   for row in records:
    if not row["ready"]:
-    need_review+=1;continue
+    need_review+=1;skipped+=1;continue
    if row["duplicate"] or row["excluded"]:
     skipped+=1;continue
    # Check inside transaction again: a concurrent import may have inserted this address.
