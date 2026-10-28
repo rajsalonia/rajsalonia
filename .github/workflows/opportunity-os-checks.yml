@@ -19,6 +19,7 @@ jobs:
       - run: node --check static/workspace.js
       - run: node --check static/outreach-studio.js
       - run: node --check static/mission-control.js
+      - run: node tests/mission_control_smoke.cjs
       - run: node --check static/source-watch.js
       - run: node --check autofill_companion/popup.js
       - run: python -m pytest -q tests
