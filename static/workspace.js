@@ -296,7 +296,7 @@ async function showNotifications(){
     $('#detail-content .dialog-body').className='dialog-body';$('#detail-content .dialog-body').innerHTML='<p class="muted small-text" style="margin-bottom:20px">Recorded deadlines and reminders. No push notifications or external calendar synchronization are connected.</p>'+(events.length?events.map(deadlineRow).join(''):empty('All clear for now','Add a verified deadline or your own reminder to see it here.',''))+'<a class="button" href="#calendar" data-close>Open calendar '+icon('arrow-right')+'</a>';
   }catch(error){$('#detail-content .dialog-body').textContent=error.message;}
 }
-function uiContext(){return {api,mutate,remember,esc,icon,fmt,tag,button,link,deadlineRow,getRequest:()=>state.request};}
+function uiContext(){return {api,mutate,remember,esc,icon,fmt,tag,button,link,deadlineRow,getRequest:()=>state.request,search:(q)=>{state.pendingFilters={q:String(q||'').trim().slice(0,300)};navigate('discover');}};}
 async function route(){
   const [page,sub]=location.hash.slice(1).split('/');const nextPage=['today','matches','discover','winter','watch','saved','applications','outreach','queue','inbox','calendar','analytics','settings'].includes(page)?page:'today';if(state.page!==nextPage){state.viewFilters[state.page]=state.filters;state.filters=state.viewFilters[nextPage]||{};state.page=nextPage;}if(state.pendingFilters){state.filters=state.pendingFilters;state.pendingFilters=null;}if(state.page==='settings'&&sub)state.settings=sub;
   const ticket=++state.request;$('#content').dataset.page=state.page;$$('[data-nav]').forEach(a=>{if(a.dataset.nav===state.page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
