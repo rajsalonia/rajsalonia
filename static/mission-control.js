@@ -29,7 +29,9 @@
       '<p class="signal-why"><strong>Why this one:</strong> '+safe(reasons[0]||'An early-career role with skills to investigate.')+'</p>'+
       '<p class="signal-caution">'+safe((work==='Remote'&&!remote.india_eligible)?'Remote-from-India not confirmed · '+(remote.evidence||'Check employer location rules'):(checks[0]||'Confirm application requirements on the official page'))+'</p>'+
       '<div class="signal-actions"><button class="signal-secondary" data-action="detail" data-key="'+safe(item.key)+'">Review fit '+ctx.icon('arrow-right')+'</button>'+
-      ctx.link('Employer listing '+ctx.icon('external-link'),item.url,'signal-primary')+'</div></article>';
+      ctx.link('Employer listing '+ctx.icon('external-link'),item.url,'signal-primary')+'</div>'+'<div class="signal-feedback"><span>Teach this recommendation</span>'+
+  '<button type="button" data-action="feedback" data-key="'+safe(item.key)+'" data-kind="Interested" title="Save a positive relevance label">Relevant</button>'+
+  '<button type="button" data-action="feedback" data-key="'+safe(item.key)+'" data-kind="Not interested" title="Save a negative relevance label">Not for me</button></div></article>';
   }
   function metric(label,value,note,icon,href,ctx){
     return '<a class="deck-metric" href="'+href+'"><span class="deck-metric-top">'+ctx.icon(icon)+safe(label)+ctx.icon('arrow-up-right')+'</span>'+
@@ -94,7 +96,7 @@
           '<section class="deck-side-panel"><div class="deck-panel-title">'+ctx.icon('calendar-days')+' <h2>Deadlines & reminders</h2></div>'+
             (upcoming.length?upcoming.slice(0,3).map(e=>ctx.deadlineRow(e)).join(''):'<p class="deck-small-empty">No near-term deadlines recorded. Unknown cutoff dates are not guessed.</p>')+
             '<a href="#calendar" class="deck-all-link">Open calendar '+ctx.icon('arrow-right')+'</a></section>'+
-          '<section class="deck-side-panel learning-panel"><div class="deck-panel-title">'+ctx.icon('brain-circuit')+' <h2>Teach your match engine</h2></div>'+
+          '<section class="deck-side-panel learning-panel"><div class="deck-panel-title">'+ctx.icon('sparkles')+' <h2>Teach your match engine</h2></div>'+
             '<p>Mark roles as interested / not interested to build a real, private training set.</p>'+
             '<div class="learning-track"><span style="width:'+Math.min(100,Math.round(n(feedback)/40*100))+'%"></span></div>'+
             '<small>'+n(feedback)+' of 40 distinct feedback examples · positive and negative labels also required</small>'+
