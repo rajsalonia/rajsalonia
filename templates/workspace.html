@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/static/aurora-tokens.css?v=5.0.0">
   <link rel="stylesheet" href="/static/workspace.css?v=5.0.0">
   <link rel="stylesheet" href="/static/glass.css?v=5.0.0">
+  <script src="/static/outreach-studio.js?v=1.0.0" defer></script>
   <script src="/static/workspace.js?v=5.0.0" defer></script>
 </head>
 <body>
@@ -18,7 +19,7 @@
   <div class="workspace-switch"><span class="workspace-monogram">R</span><span>Raj’s workspace<small>Personal workspace</small></span><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#shield-check"/></svg></div>
   <div class="workspace-label">WORKSPACE</div>
   <nav id="primary-nav" aria-label="Primary sections">
-    {% for id, icon, label in [('today','sun','Overview'),('discover','compass','Discover'),('saved','bookmark','Saved'),('applications','briefcase-business','My applications'),('queue','list-checks','Auto-apply queue'),('inbox','inbox','Inbox'),('calendar','calendar-days','Calendar'),('analytics','chart-no-axes-combined','Analytics')] %}
+    {% for id, icon, label in [('today','sun','Overview'),('discover','compass','Discover'),('winter','calendar-days','Winter internships'),('saved','bookmark','Saved'),('outreach','mail','Outreach studio'),('applications','briefcase-business','My applications'),('queue','list-checks','Auto-apply queue'),('inbox','inbox','Inbox'),('calendar','calendar-days','Calendar'),('analytics','chart-no-axes-combined','Analytics')] %}
     <a href="#{{ id }}" data-nav="{{ id }}" title="{{ label }}"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#{{ icon }}"/></svg><span class="nav-text">{{ label }}</span><span class="nav-count" id="count-{{ id }}"></span></a>
     {% endfor %}
   </nav>
