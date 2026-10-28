@@ -309,3 +309,14 @@ body::before {
  #content .filters-panel{padding:14px}
  #content .opportunities-grid{grid-template-columns:1fr}
 }
+
+.winter-guide-intro{font-size:9px;letter-spacing:.15em;font-weight:760;color:var(--deck-violet);margin:22px 0 10px}
+.winter-programs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:25px}
+.winter-program{display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--deck-panel);border:1px solid var(--deck-border);
+ border-radius:14px;min-width:0;color:var(--aurora-text);text-decoration:none;box-shadow:var(--deck-glow)}
+.winter-program:hover{border-color:#b4a0ff77;text-decoration:none;color:var(--aurora-text)}
+.winter-program strong{font-size:14px;letter-spacing:-.2px}
+.winter-program span{font-size:11px;color:var(--aurora-text);line-height:1.5}
+.winter-program small{font-size:10px;color:var(--aurora-muted);line-height:1.6}
+.winter-program b{font-size:10px;color:var(--deck-violet);margin-top:auto;padding-top:5px}
+@media(max-width:680px){.winter-programs{grid-template-columns:1fr}}
