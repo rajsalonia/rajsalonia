@@ -55,7 +55,7 @@
   </header>
   <main id="content" tabindex="-1" aria-busy="true"><div class="loading-state" role="status">Loading your workspace…</div></main>
   <nav class="mobile-dock" aria-label="Quick mobile navigation">
-    {% for id, icon, label in [('today','house','Home'),('matches','sparkles','Matches'),('winter','calendar-days','Winter'),('applications','briefcase-business','Applications'),('inbox','inbox','Inbox')] %}
+    {% for id, icon, label in [('today','sun','Home'),('matches','sparkles','Matches'),('winter','calendar-days','Winter'),('applications','briefcase-business','Applications'),('inbox','inbox','Inbox')] %}
     <a href="#{{ id }}" data-nav="{{ id }}" aria-label="{{ label }}"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#{{ icon }}"/></svg><span>{{ label }}</span></a>
     {% endfor %}
   </nav>
