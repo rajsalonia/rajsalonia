@@ -497,3 +497,25 @@ button,a,input,select{transition-timing-function:ease}
  .desk-stat,.desk-lead,.desk-main-btn,.desk-outline{transition:none;transform:none}
 }
 @keyframes desk-in{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* Native-feeling mobile quick navigation, replacing repeated sidebar trips. */
+.mobile-dock{display:none}
+@media(max-width:900px){
+ .mobile-dock{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;
+  position:fixed;left:0;right:0;bottom:0;z-index:39;
+  padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--desk-border);background:var(--aurora-glass);
+  box-shadow:0 -8px 25px rgba(0,0,0,.12);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)
+ }
+ .mobile-dock a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-height:46px;text-decoration:none;color:var(--desk-muted);font-size:9px;font-weight:620;
+  border-radius:10px;padding:5px 3px}
+ .mobile-dock a[aria-current=page]{color:var(--desk-accent);background:var(--desk-soft)}
+ .mobile-dock .icon{width:19px;height:19px}
+ .mobile-dock a:hover{background:var(--desk-soft);color:var(--aurora-text);text-decoration:none}
+ .workspace-footer{padding-bottom:calc(75px + env(safe-area-inset-bottom))}
+ #content{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+}
+@media(max-width:350px){.mobile-dock a{font-size:8px}.mobile-dock .icon{width:17px;height:17px}}
