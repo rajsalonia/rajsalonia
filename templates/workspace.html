@@ -2,17 +2,17 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light dark"><meta name="theme-color" content="#101a35"><meta name="csrf-token" content="{{ csrf_token }}">
-  <title>Opportunity OS · Aurora Glass</title><link rel="icon" href="/static/mark.svg">
+  <meta name="color-scheme" content="light dark"><meta name="theme-color" content="#0a1018"><meta name="csrf-token" content="{{ csrf_token }}">
+  <title>Opportunity OS · Career Desk</title><link rel="icon" href="/static/mark.svg">
   <script>try{document.documentElement.dataset.theme=localStorage.getItem('career-theme')||'dark';document.documentElement.classList.toggle('sidebar-collapsed',localStorage.getItem('career-sidebar')==='collapsed')}catch(e){}</script>
   <link rel="stylesheet" href="/static/aurora-tokens.css?v=5.0.0">
   <link rel="stylesheet" href="/static/workspace.css?v=5.0.0">
   <link rel="stylesheet" href="/static/glass.css?v=5.0.0">
   <link rel="stylesheet" href="/static/outreach-studio.css?v=1.0.0">
-  <link rel="stylesheet" href="/static/mission-control.css?v=6.0.0">
+  <link rel="stylesheet" href="/static/mission-control.css?v=7.0.0">
   <link rel="stylesheet" href="/static/source-watch.css?v=6.0.0">
   <script src="/static/outreach-studio.js?v=1.0.0" defer></script>
-  <script src="/static/mission-control.js?v=6.0.0" defer></script>
+  <script src="/static/mission-control.js?v=7.0.0" defer></script>
   <script src="/static/source-watch.js?v=6.0.0" defer></script>
   <script src="/static/workspace.js?v=5.0.0" defer></script>
 </head>
@@ -50,11 +50,16 @@
 <div class="workspace">
   <header class="topbar">
     <button class="icon-button mobile-menu" data-action="menu" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#menu"/></svg></button>
-    <div class="topbar-location"><span id="breadcrumb">Workspace <span>/</span> Overview</span></div><button class="topbar-quick-search" data-action="command" aria-label="Search or jump to… Ctrl K"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#search"/></svg><span>Search or jump to…</span><kbd aria-hidden="true">Ctrl K</kbd></button>
-    <div class="topbar-actions"><span class="private-label"><span class="status-dot"></span> India · 2028 focus</span><button class="icon-button" data-action="theme" aria-label="Switch color theme" title="Switch color theme"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#sun"/></svg></button><button class="icon-button" data-action="notifications" aria-label="View recorded reminders" title="Recorded reminders"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#bell"/></svg></button><div class="account-menu"><button class="avatar small" data-action="account" aria-label="RS account menu" aria-expanded="false" aria-controls="account-options">RS</button><div id="account-options" class="account-options" hidden><strong>Raj Salonia</strong><span>Personal workspace</span><a href="#settings/profile">Profile & preferences</a><a href="/classic#resume">Resume vault</a><button data-action="logout">Sign out</button></div></div></div>
+    <div class="topbar-location"><span id="breadcrumb">Workspace <span>/</span> Overview</span></div><button class="topbar-quick-search" data-action="command" aria-label="Search or jump to… Ctrl K"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#search"/></svg><span>Search roles or jump to a page…</span><kbd aria-hidden="true">Ctrl K</kbd></button>
+    <div class="topbar-actions"><span class="private-label"><span class="status-dot"></span> Private · India 2028</span><button class="icon-button" data-action="theme" aria-label="Switch color theme" title="Switch color theme"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#sun"/></svg></button><button class="icon-button" data-action="notifications" aria-label="View recorded reminders" title="Recorded reminders"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#bell"/></svg></button><div class="account-menu"><button class="avatar small" data-action="account" aria-label="RS account menu" aria-expanded="false" aria-controls="account-options">RS</button><div id="account-options" class="account-options" hidden><strong>Raj Salonia</strong><span>Personal workspace</span><a href="#settings/profile">Profile & preferences</a><a href="/classic#resume">Resume vault</a><button data-action="logout">Sign out</button></div></div></div>
   </header>
   <main id="content" tabindex="-1" aria-busy="true"><div class="loading-state" role="status">Loading your workspace…</div></main>
-  <footer class="workspace-footer"><span><span class="status-dot"></span> Your next move starts with the right information.</span><span>Opportunity OS 6 <span aria-hidden="true">·</span> Asia/Kolkata</span></footer>
+  <nav class="mobile-dock" aria-label="Quick mobile navigation">
+    {% for id, icon, label in [('today','house','Home'),('matches','sparkles','Matches'),('winter','calendar-days','Winter'),('applications','briefcase-business','Applications'),('inbox','inbox','Inbox')] %}
+    <a href="#{{ id }}" data-nav="{{ id }}" aria-label="{{ label }}"><svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#{{ icon }}"/></svg><span>{{ label }}</span></a>
+    {% endfor %}
+  </nav>
+  <footer class="workspace-footer"><span><span class="status-dot"></span> Your next move starts with the right information.</span><span>Opportunity OS · Career Desk <span aria-hidden="true">·</span> Asia/Kolkata</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="command-dialog" aria-labelledby="command-title"><div class="command-search"> <svg class="icon" aria-hidden="true"><use href="/static/vendor/lucide/icons.svg#search"/></svg><label class="sr-only" for="command-input" id="command-title">Search or jump to a page</label><input id="command-input" autocomplete="off" placeholder="Search opportunities or jump to…" role="combobox" aria-autocomplete="list" aria-controls="command-results" aria-expanded="true"><button class="key-button" data-close aria-label="Close command palette">Esc</button></div><div id="command-results" role="listbox" aria-label="Commands"></div><footer class="command-footer"><span>↑ ↓ navigate <span>↵ open</span></span><span>YOUR NEXT MOVE, CLOSER</span></footer></dialog>
