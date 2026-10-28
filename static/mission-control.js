@@ -76,7 +76,7 @@
         '<div class="desk-lead-links">' +
           '<button type="button" data-action="detail" data-key="' + key + '" aria-label="Review ' +
              esc(item.title) + '">' + ctx.icon('book-open') + '</button>' +
-          ctx.link('Open listing ' + ctx.icon('arrow-up-right'), item.url, 'desk-external') +
+          ctx.link('Employer listing ' + ctx.icon('arrow-up-right'), item.url, 'desk-external') +
         '</div></div></article>';
   }
 
