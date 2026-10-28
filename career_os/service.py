@@ -229,6 +229,27 @@ class CareerService:
         if skill and skill not in SKILL_FILTERS:raise ValueError('Choose a supported skill filter.')
         result=[]
         for item in items:
+            if settings.get('season')=='winter':
+                # Winter collection = evidence of a Nov-Feb intake, not a claim of availability.
+                if item['category']!='Internship' or item['eligibility']['code'] in ('closed','ineligible'):continue
+                local_today=datetime.now(ZoneInfo('Asia/Kolkata')).date()
+                start_year=local_today.year if local_today.month>=7 else local_today.year-1
+                end_year=start_year+1
+                text_for_season=' '.join(str(x or '') for x in (
+                    item.get('title'), item.get('description'), item.get('summary'),
+                    item['extracted'].get('description')))
+                winter_patterns=(
+                    r'\\bwinter\\b',
+                    rf'\\b(?:november|december|nov|dec)\\s+{start_year}\\b',
+                    rf'\\b(?:january|february|jan|feb)\\s+{end_year}\\b',
+                    rf'\\b{start_year}[-/– ]+(?:{end_year}|{str(end_year)[-2:]})\\b',
+                    rf'\\b{start_year}[-/]1[12]\\b',
+                    rf'\\b{end_year}[-/]0?[12]\\b',
+                )
+                if not any(re.search(pat,text_for_season,re.I) for pat in winter_patterns):continue
+                # A standalone 'winter 2025' listing must not be treated as this season.
+                if re.search(r'\\bwinter\\s+20\\d{2}\\b',text_for_season,re.I):
+                    if not re.search(rf'\\bwinter\\s+{start_year}\\b',text_for_season,re.I):continue
             if item['dismissed'] and settings.get('view')!='dismissed':continue
             if item['archived'] and settings.get('view')!='archive':continue
             if settings.get('view')=='saved' and not item['saved']:continue
