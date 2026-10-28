@@ -61,7 +61,7 @@
   }).join(''):`<p class="muted">No contacts match. Import a CSV/XLSX sheet or change your search.</p>`;
  }
  function drawPreview(){
-  if(!state.preview){el('outreach-preview').innerHTML='';return;}
+  if(!state.preview){el('outreach-preview').innerHTML='';if(el('outreach-import'))el('outreach-import').disabled=true;return;}
   const d=state.preview;
   const rows=d.preview.map(c=>`<tr><td>${h(c.company||'Needs verification')}</td><td>${h(c.email||'Missing')}</td><td>${h(c.name)}</td><td>${c.duplicate?'Duplicate':c.excluded?'Blocked':c.ready?'Ready':'Review'}<small>${h((c.issues||[]).join(' · '))}</small></td></tr>`).join('');
   el('outreach-preview').innerHTML=`<div class="outreach-preview-summary">${d.total_rows} parsed · ${d.ready} importable · ${d.needs_review} need review · ${d.duplicates} duplicates · ${d.excluded} blocked</div>
@@ -162,7 +162,7 @@
    const sent=await req('/api/gmail/send',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({to,subject,body,job_id:'contact_'+contact.id,attach_original_resume,reviewed_and_confirmed:true})});
    el('outreach-approved').checked=false;
-   await reloadContacts();
+   try{await reloadContacts();}catch(_){/* Preserve confirmed send receipt even if queue refresh fails. */}
    say('Sent ONE reviewed email. Gmail receipt: '+(sent.gmail_message_id||'accepted')+'. Use Next unsent to prepare another contact.');
   }
  }
@@ -170,7 +170,7 @@
   const target=event.target.closest('[data-outreach]');if(!target||state.busy)return;
   event.preventDefault();
   disabled(true);
-  try{await doAction(target);}catch(error){say(error.message,true);}finally{disabled(false);if(state.preview)el('outreach-import').disabled=!state.preview.ready;}
+  try{await doAction(target);}catch(error){say(error.message,true);}finally{disabled(false);if(el('outreach-import'))el('outreach-import').disabled=!state.preview?.ready;document.querySelectorAll('[data-outreach="select"]').forEach(b=>{const row=state.contacts.find(c=>c.id===b.dataset.id);if(row?.excluded)b.disabled=true;});}
  });
  document.addEventListener('input',event=>{
   const t=event.target;if(t.id==='outreach-find'){state.search=t.value.trim().toLowerCase();drawContacts();}
