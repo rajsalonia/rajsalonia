@@ -1,0 +1,62 @@
+/* Aurora Glass extension: Winter intake + review-first contact outreach. */
+.outreach-callout{
+ border:1px solid var(--line,rgba(255,255,255,.14));
+ border-radius:16px;padding:16px 20px;margin:0 0 24px;
+ background:linear-gradient(115deg,rgba(125,108,255,.12),rgba(77,197,211,.05));
+ color:var(--ink,var(--text,#e8ebff));line-height:1.7;
+}
+.outreach-callout strong{display:block;margin-bottom:3px}
+.outreach-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:20px;align-items:start}
+.outreach-column{display:grid;gap:20px;min-width:0}
+.outreach-panel{padding:22px;min-width:0}
+.outreach-panel .section-heading{margin-bottom:20px}
+.outreach-panel .section-heading h2{margin:0 0 5px}
+.outreach-panel label{display:block;font-weight:600;font-size:13px;margin:12px 0 7px}
+.outreach-panel input:not([type=checkbox]),.outreach-panel select,.outreach-panel textarea{
+ display:block;width:100%;max-width:100%;box-sizing:border-box;
+ background:var(--surface,rgba(18,22,34,.76));color:var(--ink,var(--text,#fff));
+ border:1px solid var(--line,rgba(255,255,255,.14));border-radius:11px;padding:11px 12px;
+ outline-offset:3px;font:inherit
+}
+.outreach-panel textarea{min-height:260px;line-height:1.55;resize:vertical}
+.outreach-panel input:focus-visible,.outreach-panel select:focus-visible,.outreach-panel textarea:focus-visible{
+ outline:2px solid var(--accent,#9284ff);border-color:transparent
+}
+.outreach-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:17px 0 0}
+.outreach-actions .button{min-height:40px}
+.outreach-actions button:disabled{opacity:.55;cursor:not-allowed}
+.outreach-preview-summary{margin:15px 0 8px;font-weight:650}
+.outreach-preview-table{max-height:290px;overflow:auto;border:1px solid var(--line,rgba(255,255,255,.15));border-radius:12px}
+.outreach-preview-table table{width:100%;border-collapse:collapse;font-size:12px;min-width:460px}
+.outreach-preview-table td,.outreach-preview-table th{text-align:left;vertical-align:top;padding:9px;border-bottom:1px solid var(--line,rgba(255,255,255,.11))}
+.outreach-preview-table small{display:block;opacity:.72;margin-top:3px;line-height:1.4}
+.outreach-contacts{max-height:590px;overflow:auto;padding-right:5px;margin-top:16px}
+.outreach-person{display:flex;justify-content:space-between;gap:12px;align-items:center;
+ padding:13px 9px;border-bottom:1px solid var(--line,rgba(255,255,255,.1));transition:background .16s}
+.outreach-person.selected{background:rgba(112,104,250,.1);border-radius:12px}
+.outreach-person-main{min-width:0;display:flex;flex-direction:column;gap:3px}
+.outreach-person-main strong,.outreach-person-main small{max-width:100%;overflow-wrap:anywhere}
+.outreach-person-main small{opacity:.72}
+.outreach-person-actions{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.outreach-person-actions button{min-height:31px}
+.outreach-address{font-size:11px}
+.outreach-status{font-size:11px;font-weight:650;width:max-content;border-radius:7px;padding:4px 7px}
+.outreach-status.pending{background:rgba(56,193,143,.12);color:var(--success,#7bddb1)}
+.outreach-status.sent{background:rgba(114,154,244,.15);color:var(--accent,#aba0fc)}
+.outreach-status.blocked{background:rgba(224,96,111,.12);color:var(--danger,#fc8e96)}
+.outreach-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.outreach-mode{display:flex;gap:6px;padding:5px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:13px;margin-bottom:16px;background:rgba(120,125,160,.06)}
+.outreach-mode button{background:transparent;color:inherit;border:0;flex:1;border-radius:9px;padding:9px 14px;cursor:pointer}
+.outreach-mode button[aria-pressed=true]{background:var(--surface,rgba(109,102,228,.2));box-shadow:0 1px 8px rgba(0,0,0,.08);font-weight:700}
+.outreach-checks{padding:8px 0}
+.outreach-checks label{display:flex;gap:9px;align-items:flex-start;font-weight:500;line-height:1.5}
+.outreach-checks input{margin-top:3px;flex-shrink:0;accent-color:var(--accent,#9887ff)}
+.outreach-notice{margin:16px 0;padding:11px 13px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:10px;font-size:13px}
+.outreach-notice.error{border-color:rgba(235,91,112,.5);color:var(--danger,#fc9a9a)}
+.winter-callout{margin:0 0 20px;padding:18px 20px;border:1px solid rgba(148,133,255,.26);border-radius:16px;
+ background:linear-gradient(120deg,rgba(103,122,255,.14),rgba(117,215,248,.045))}
+.winter-callout h2{font-size:16px;margin:0 0 5px}
+.winter-callout p{margin:0;line-height:1.6}
+@media(max-width:1050px){.outreach-layout{grid-template-columns:1fr}.outreach-contacts{max-height:400px}}
+@media(max-width:560px){.outreach-panel{padding:15px}.outreach-options{grid-template-columns:1fr}.outreach-person{align-items:flex-start}.outreach-person-actions{gap:10px}.outreach-actions .button{flex:1;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.outreach-person{transition:none}}
