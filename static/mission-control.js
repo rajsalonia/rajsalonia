@@ -65,7 +65,7 @@
           flag(money(item)) + '</div>' +
         (expanded ? '<p class="desk-lead-why">' + ctx.icon('sparkles') +
           '<span>' + esc(why) + '</span></p>' : '') +
-        '<p class="desk-lead-caution">' + ctx.icon('info') + esc(check) + '</p>' +
+        '<p class="desk-lead-caution">' + ctx.icon('circle-question-mark') + esc(check) + '</p>' +
         (expanded ? '<div class="desk-lead-feedback"><span>Is this role relevant to you?</span>' +
           '<button data-action="feedback" data-kind="Interested" data-key="' + key + '">Yes</button>' +
           '<button data-action="feedback" data-kind="Not interested" data-key="' + key + '">Not for me</button></div>' : '') +
@@ -75,7 +75,7 @@
         labelFor(item) +
         '<div class="desk-lead-links">' +
           '<button type="button" data-action="detail" data-key="' + key + '" aria-label="Review ' +
-             esc(item.title) + '">' + ctx.icon('eye') + '</button>' +
+             esc(item.title) + '">' + ctx.icon('book-open') + '</button>' +
           ctx.link('Open listing ' + ctx.icon('arrow-up-right'), item.url, 'desk-external') +
         '</div></div></article>';
   }
@@ -171,7 +171,7 @@
     const feedback = count(model?.feedback_records);
     const required = Math.max(40, count(model?.minimum_distinct_opportunities));
     const progress = Math.min(100,Math.round(feedback/required*100));
-    return '<section class="desk-model-note"><div class="desk-note-icon">' + ctx.icon('brain') + '</div>' +
+    return '<section class="desk-model-note"><div class="desk-note-icon">' + ctx.icon('sparkles') + '</div>' +
       '<div><strong>Make your matches smarter</strong><p>Rate real roles to build a private relevance model.</p>' +
       '<div class="desk-progress"><span style="width:' + progress + '%"></span></div>' +
       '<small>' + feedback + ' / ' + required + ' labeled roles · balanced labels required</small>' +
@@ -210,7 +210,7 @@
       '<section class="desk-search-panel">' + searchBox(ctx) + '</section>' +
       '<section class="desk-stats" aria-label="Your opportunity overview">' +
         quickCount(match.counts?.strong, 'Worth reviewing', 'Profile-based suggestions', '#matches','sparkles',ctx) +
-        quickCount(match.counts?.winter, 'Winter signals', 'Intake dates need review', '#winter','snowflake',ctx) +
+        quickCount(match.counts?.winter, 'Winter signals', 'Intake dates need review', '#winter','calendar-days',ctx) +
         quickCount(match.counts?.remote_india_stated, 'India-remote stated', 'Confirm employer work scope', '#matches','globe',ctx) +
         quickCount(analytics.tracked, 'Tracked applications', 'Not all employer-confirmed', '#applications','briefcase-business',ctx) +
         '</section>' +
@@ -278,7 +278,7 @@
     if(!target) return;
     target.innerHTML = items.length ?
       items.map(item => lead(item,context,true)).join('') :
-      emptyState('search-x','No matches for these filters',
+      emptyState('search','No matches for these filters',
         'Try a different track, remove the search term, or explore the full discovery feed.','discover');
     const label = document.getElementById('desk-result-count');
     if(label) label.textContent = items.length + ' shown · ' + count(dataset.total) +
@@ -329,7 +329,7 @@
          optionButton('cloud','Cloud / DevOps',(match.items||[]).filter(x=>count(x.fit?.track_hits?.cloud)).length) +
          optionButton('remote','India-remote stated',counts.remote_india_stated) +
          optionButton('winter','Winter',counts.winter) + '</div>' +
-       '<div class="desk-match-trust">' + ctx.icon('info') +
+       '<div class="desk-match-trust">' + ctx.icon('circle-question-mark') +
          'Remote does not automatically mean India-eligible. “Fit” describes skill relevance—not your chances of being hired.' +
          '</div>' +
        '<div class="desk-results-heading"><h2>Recommended for review</h2>' +
