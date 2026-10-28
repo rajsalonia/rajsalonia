@@ -10,6 +10,7 @@ from .service import CareerService
 from .discovery import Discovery, SourceFailure
 from .mail import Mail
 from .intelligence import STAGES, SUBSTATES, FEEDBACK, parse_deadline
+from .match_engine import shortlist
 
 def ics_escape(value):return str(value or '').replace('\\','\\\\').replace('\n','\\n').replace(';','\\;').replace(',','\\,').replace('\r','')
 
@@ -81,6 +82,17 @@ def register(app,db,owner,check_origin,clock,cipher,token_table,legacy_token,goo
 
     @bp.get('/api/v3/today')
     def today():return run(service.today)
+
+
+    @bp.get('/api/v3/matches')
+    def matches():
+        """Profile-grounded shortlist, never an employer-confirmed eligibility result."""
+        def action():
+            selected=shortlist(service.snapshot(),limit=80)
+            return {**selected,'model':service.model_status(),
+                    'refreshed_at':clock(),
+                    'note':'Results come from cached public board records. Refresh sources and open each employer listing to confirm availability.'}
+        return run(action)
 
     @bp.post('/api/v3/visit')
     def visit():store.put_setting('career_last_visit',clock());return {'recorded':True}
