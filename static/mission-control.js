@@ -1,173 +1,389 @@
-/* Opportunity OS 6 — focused command deck. This module never sends email or applies. */
-(function(){
+/* Opportunity OS — Career Desk (2026). Real workflows, not decorative analytics. */
+(function () {
   'use strict';
-  let activeTab='all', latest=null, context=null;
-  const safe=(value)=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const n=x=>Math.max(0,Number(x)||0);
-  function fitItem(item,ctx,mode='grid'){
-    const fit=item.fit||{}, f=item.extracted||{},checks=fit.checks||[], reasons=fit.reasons||[];
-    const work=f.work_mode||'Work mode unknown', remote=fit.remote||{};
-    const pay=f.fields?.compensation?.value||'Stipend not disclosed';
-    const loc=item.location||'Location not provided';
-    const company=item.company||'Employer not listed';
-    const score=n(fit.score);
-    const winter=String(fit.winter||'').startsWith('winter ')||String(fit.winter||'').startsWith('possible winter ');
-    const source=item.provider||'Recorded source';
-    const stage=fit.level==='strong'?'Worth reviewing':'Verify eligibility';
-    const heading=mode==='row'?'signal-row':'signal-card';
-    return '<article class="'+heading+'">'+
-      '<div class="signal-top"><span class="signal-employer"><span class="signal-avatar">'+safe(company.charAt(0))+'</span>'+
-        '<span><strong>'+safe(company)+'</strong><small>'+safe(source)+' · '+(item.stale?'Check freshness':'Recorded opening')+'</small></span></span>'+
-        '<span class="signal-score" title="Rules-based relevance; not probability of being hired">'+score+'<small>/100 fit</small></span></div>'+
-      '<button class="signal-role" type="button" data-action="detail" data-key="'+safe(item.key)+'">'+safe(item.title)+'</button>'+
-      '<div class="signal-tags">'+
-        '<span class="signal-pill '+(fit.level==='strong'?'positive':'neutral')+'">'+safe(stage)+'</span>'+
-        '<span class="signal-pill">'+safe(fit.track==='general'?'Software':String(fit.track||'general').toUpperCase())+'</span>'+
-        (winter?'<span class="signal-pill winter">Winter signal</span>':'')+
-        '<span class="signal-pill">'+safe(work)+'</span></div>'+
-      '<p class="signal-meta">'+safe(loc)+' <span>·</span> '+safe(pay)+'</p>'+
-      '<p class="signal-why"><strong>Why this one:</strong> '+safe(reasons[0]||'An early-career role with skills to investigate.')+'</p>'+
-      '<p class="signal-caution">'+safe((work==='Remote'&&!remote.india_eligible)?'Remote-from-India not confirmed · '+(remote.evidence||'Check employer location rules'):(checks[0]||'Confirm application requirements on the official page'))+'</p>'+
-      '<div class="signal-actions"><button class="signal-secondary" data-action="detail" data-key="'+safe(item.key)+'">Review fit '+ctx.icon('arrow-right')+'</button>'+
-      ctx.link('Employer listing '+ctx.icon('external-link'),item.url,'signal-primary')+'</div>'+'<div class="signal-feedback"><span>Teach this recommendation</span>'+
-  '<button type="button" data-action="feedback" data-key="'+safe(item.key)+'" data-kind="Interested" title="Save a positive relevance label">Relevant</button>'+
-  '<button type="button" data-action="feedback" data-key="'+safe(item.key)+'" data-kind="Not interested" title="Save a negative relevance label">Not for me</button></div></article>';
+
+  let context = null;
+  let dataset = null;
+  let activeTab = 'all';
+  let sortMode = 'fit';
+  let searchText = '';
+
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  })[c]);
+  const count = value => Math.max(0, Number(value) || 0);
+  const text = (value, fallback = 'Not stated') => String(value || fallback);
+  const itemTrack = item => text(item.fit?.track, 'software');
+  const winter = item => /^(winter |possible winter )/i.test(item.fit?.winter || '');
+  const money = item => text(item.extracted?.fields?.compensation?.value, 'Pay not disclosed');
+  const age = item => item.stale ? 'Source needs rechecking' : 'Source record';
+  const initial = value => String(value || '?').trim().charAt(0).toUpperCase();
+  const flag = (label, className = '') =>
+    '<span class="desk-chip ' + className + '">' + esc(label) + '</span>';
+
+  function labelFor(item) {
+    const fit = item.fit || {};
+    if (fit.level === 'strong') return flag('Good match', 'is-success');
+    if (item.eligibility?.code === 'unknown') return flag('Eligibility unknown', 'is-warning');
+    return flag('Needs review', 'is-warning');
   }
-  function metric(label,value,note,icon,href,ctx){
-    return '<a class="deck-metric" href="'+href+'"><span class="deck-metric-top">'+ctx.icon(icon)+safe(label)+ctx.icon('arrow-up-right')+'</span>'+
-      '<strong>'+n(value)+'</strong><small>'+safe(note)+'</small></a>';
+
+  function trackLabel(item) {
+    const track = itemTrack(item);
+    return {
+      backend:'Python / Backend', ai:'AI Engineering',
+      cloud:'Cloud / DevOps', general:'Software'
+    }[track] || 'Software';
   }
-  function emptyCard(){
-    return '<div class="deck-empty"><div class="deck-empty-glow">✦</div><h3>No eligible leads in the current cache</h3><p>Run source checks, add an official employer board, or widen your search. Unknown requirements are never presented as confirmed eligibility.</p>'+
-    '<div class="deck-empty-actions"><a href="#watch" class="signal-primary">Connect a career page</a><a href="#discover" class="signal-secondary">Explore all roles</a></div></div>';
+
+  function location(item) {
+    const mode = text(item.extracted?.work_mode, 'Work mode unknown');
+    if (mode === 'Remote' && item.fit?.remote?.india_eligible) return 'Remote · India stated';
+    if (mode === 'Remote') return 'Remote · India not verified';
+    if (mode === 'Hybrid') return 'Hybrid · ' + text(item.location, 'location unknown');
+    if (mode === 'On-site') return 'On-site · ' + text(item.location, 'location unknown');
+    return text(item.location, 'Location not stated');
   }
-  const last=(items,n=3)=>items.slice(0,n);
-  async function renderHome(ticket,ctx){
-    context=ctx;
-    const [today,report,match]=await Promise.all([ctx.api('today'),ctx.api('analytics'),ctx.api('matches')]);
-    if(ticket!==ctx.getRequest())return;
-    latest=match;
-    ctx.remember([...today.recommended,...today.research_first,...today.recently_discovered,...today.pinned,...match.items]);
-    const count=match.counts||{}, items=match.items||[];
-    const top=items.filter(x=>x.fit.level==='strong').slice(0,2);
-    const featured=top.length?top:items.slice(0,2);
-    const recommendations=featured.length?featured.map(x=>fitItem(x,ctx)).join(''):emptyCard();
-    const upcoming=[...today.deadlines.today,...today.deadlines.week,...today.deadlines.month].slice(0,4);
-    const inReview=(today.priorities||[]).find(x=>x.kind==='inbox')?.count||0;
-    const urgent=(today.priorities||[]).find(x=>x.kind==='deadline')?.count||0;
-    const feedback=match.model?.feedback_records||0;
-    const sourceCount=match.items?.filter(x=>!x.stale).length||0;
-    const hour=Number(new Intl.DateTimeFormat('en-GB',{hour:'numeric',timeZone:'Asia/Kolkata'}).format(new Date()));
-    const greet=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
-    const date=new Intl.DateTimeFormat('en-IN',{day:'numeric',month:'long',weekday:'long',timeZone:'Asia/Kolkata'}).format(new Date());
-    document.getElementById('content').innerHTML=
-      '<div class="deck-shell">'+
-        '<div class="deck-utility"><span class="live-indicator"><i></i>PERSONAL CAREER RADAR</span><span>'+safe(date)+' · India</span></div>'+
-        '<section class="deck-hero"><div class="deck-hero-copy"><span class="deck-kicker">'+safe(greet)+', Raj <span>✦</span></span>'+
-          '<h1>Find the right internship.<br><em>Skip the noise.</em></h1>'+
-          '<p>Your next move, not another dashboard. Employer-sourced roles ranked for Python, backend, AI and cloud — with the eligibility questions that matter.</p>'+
-          '<div class="deck-hero-actions"><a class="deck-action-main" href="#matches">Explore my best matches '+ctx.icon('arrow-up-right')+'</a>'+
-            '<a class="deck-action-glass" href="#winter">'+ctx.icon('calendar-days')+' Winter internships</a></div>'+
-          '<div class="deck-hero-foot"><span>'+ctx.icon('shield-check')+' Evidence-first recommendations</span>'+
-             '<span>'+ctx.icon('globe')+' Remote from India requires proof</span></div></div>'+
-          '<div class="deck-orbit" aria-label="'+n(count.strong)+' strong-match signals from stored records">'+
-            '<div class="deck-orbit-halo"><span class="orbit-dash dash-a"></span><span class="orbit-dash dash-b"></span><span class="orbit-dot dot-a"></span><span class="orbit-dot dot-b"></span>'+
-            '<div class="deck-orbit-core"><span>YOUR SIGNAL</span><strong>'+n(count.strong)+'</strong><small>worth reviewing</small></div></div>'+
-            '<div class="orbit-footnote">Not acceptance odds · refreshed when sources run</div></div></section>'+
-        '<section class="deck-metrics" aria-label="Recorded opportunities">'+
-          metric('Good-fit leads',count.strong,'Rules-based shortlist','sparkles','#matches',ctx)+
-          metric('Winter signals',count.winter,'Verify intake dates','calendar-days','#winter',ctx)+
-          metric('India-remote stated',count.remote_india_stated,'Eligibility still needs checking','globe','#matches',ctx)+
-          metric('Application pipeline',report.tracked,'Tracked stages, not confirmed applications','briefcase-business','#applications',ctx)+
-        '</section>'+
-        '<div class="deck-main"><div class="deck-primary">'+
-          '<div class="deck-section-head"><div><div class="deck-section-eyebrow">01 / OPPORTUNITY SIGNALS</div><h2>Worth your attention</h2><p>Focused recommendations with evidence — not a giant job-board feed.</p></div><a href="#matches" class="deck-all-link">View shortlist '+ctx.icon('arrow-right')+'</a></div>'+
-          '<div class="deck-featured">'+recommendations+'</div>'+
-          '<div class="deck-section-head deck-gap"><div><div class="deck-section-eyebrow">02 / STAY AHEAD</div><h2>Recently discovered</h2><p>From source records; links may need a live check.</p></div><a href="#discover" class="deck-all-link">Browse all '+ctx.icon('arrow-right')+'</a></div>'+
-          '<div class="deck-feed">'+(today.recently_discovered.length?last(today.recently_discovered,4).map(x=>
-            '<button type="button" data-action="detail" data-key="'+safe(x.key)+'" class="deck-feed-row"><span class="deck-feed-icon">'+safe((x.company||'O')[0])+'</span><span class="deck-feed-text"><strong>'+safe(x.title)+'</strong><small>'+safe(x.company||'Employer')+' · '+safe(x.location||'Location unspecified')+'</small></span>'+ctx.icon('arrow-up-right')+'</button>').join(''):
-           '<div class="deck-feed-none">No newly discovered records since the last visit. Refresh official sources to check for changes.</div>')+'</div>'+
-        '</div><aside class="deck-side">'+
-          '<section class="deck-side-panel action-deck"><div class="deck-section-eyebrow">YOUR NEXT MOVES</div><h2>Keep moving.</h2>'+
-           '<a href="#matches" class="action-deck-row"><span class="action-number">01</span><span><strong>Review your best leads</strong><small>'+n(count.strong)+' promising signals, evidence attached</small></span>'+ctx.icon('arrow-up-right')+'</a>'+
-           '<a href="#outreach" class="action-deck-row"><span class="action-number">02</span><span><strong>Prepare recruiter outreach</strong><small>One thoughtful email at a time</small></span>'+ctx.icon('arrow-up-right')+'</a>'+
-           '<a href="#inbox" class="action-deck-row"><span class="action-number">03</span><span><strong>Check real recruiter responses</strong><small>'+n(inReview)+' recorded inbox signals to review</small></span>'+ctx.icon('arrow-up-right')+'</a>'+
-           '<a href="#watch" class="action-deck-row"><span class="action-number">04</span><span><strong>Watch more companies</strong><small>Greenhouse, Lever and Ashby career boards</small></span>'+ctx.icon('arrow-up-right')+'</a></section>'+
-          '<section class="deck-side-panel"><div class="deck-panel-title">'+ctx.icon('calendar-days')+' <h2>Deadlines & reminders</h2></div>'+
-            (upcoming.length?upcoming.slice(0,3).map(e=>ctx.deadlineRow(e)).join(''):'<p class="deck-small-empty">No near-term deadlines recorded. Unknown cutoff dates are not guessed.</p>')+
-            '<a href="#calendar" class="deck-all-link">Open calendar '+ctx.icon('arrow-right')+'</a></section>'+
-          '<section class="deck-side-panel learning-panel"><div class="deck-panel-title">'+ctx.icon('sparkles')+' <h2>Teach your match engine</h2></div>'+
-            '<p>Mark roles as interested / not interested to build a real, private training set.</p>'+
-            '<div class="learning-track"><span style="width:'+Math.min(100,Math.round(n(feedback)/40*100))+'%"></span></div>'+
-            '<small>'+n(feedback)+' of 40 distinct feedback examples · positive and negative labels also required</small>'+
-            '<a href="#matches" class="deck-all-link">Rate suggestions '+ctx.icon('arrow-right')+'</a></section>'+
-          '<div class="deck-source-note">'+ctx.icon('shield-check')+'<span><strong>'+n(sourceCount)+' shortlist records with recent source checks</strong><small>A successful check does not guarantee a vacancy is still open.</small></span></div>'+
-        '</aside></div></div>';
-    const countSaved=document.getElementById('count-saved'),countApp=document.getElementById('count-applications');
-    if(countSaved)countSaved.textContent=today.counts.saved||'';
-    if(countApp)countApp.textContent=report.tracked||'';
+
+  function lead(item, ctx, expanded = false) {
+    const fit = item.fit || {};
+    const company = text(item.company, 'Employer not disclosed');
+    const key = esc(item.key);
+    const check = (fit.checks || [])[0] || 'Check employer requirements before applying.';
+    const why = (fit.reasons || [])[0] || 'An early-career engineering role to investigate.';
+    return '<article class="desk-lead' + (expanded ? ' is-expanded' : '') + '">' +
+      '<div class="desk-lead-icon" aria-hidden="true">' + esc(initial(company)) + '</div>' +
+      '<div class="desk-lead-body">' +
+        '<div class="desk-lead-company">' + esc(company) +
+          '<span class="desk-separator">/</span>' + esc(text(item.provider, 'Recorded source')) +
+          (winter(item) ? flag('Winter signal', 'is-winter') : '') + '</div>' +
+        '<button type="button" class="desk-lead-title" data-action="detail" data-key="' + key + '">' +
+          esc(item.title) + ctx.icon('arrow-up-right') + '</button>' +
+        '<div class="desk-lead-facts">' +
+          flag(trackLabel(item)) + flag(location(item), item.extracted?.work_mode === 'Remote' &&
+            !fit.remote?.india_eligible ? 'is-warning' : '') +
+          flag(money(item)) + '</div>' +
+        (expanded ? '<p class="desk-lead-why">' + ctx.icon('sparkles') +
+          '<span>' + esc(why) + '</span></p>' : '') +
+        '<p class="desk-lead-caution">' + ctx.icon('info') + esc(check) + '</p>' +
+        (expanded ? '<div class="desk-lead-feedback"><span>Is this role relevant to you?</span>' +
+          '<button data-action="feedback" data-kind="Interested" data-key="' + key + '">Yes</button>' +
+          '<button data-action="feedback" data-kind="Not interested" data-key="' + key + '">Not for me</button></div>' : '') +
+      '</div>' +
+      '<div class="desk-lead-aside"><div class="desk-fit" title="Rules-based relevance, not hiring probability">' +
+        '<strong>' + count(fit.score) + '</strong><small>fit score</small></div>' +
+        labelFor(item) +
+        '<div class="desk-lead-links">' +
+          '<button type="button" data-action="detail" data-key="' + key + '" aria-label="Review ' +
+             esc(item.title) + '">' + ctx.icon('eye') + '</button>' +
+          ctx.link('Open listing ' + ctx.icon('arrow-up-right'), item.url, 'desk-external') +
+        '</div></div></article>';
+  }
+
+  function emptyState(iconName, title, detail, target = 'watch') {
+    return '<div class="desk-empty">' +
+      '<span class="desk-empty-symbol">' + context.icon(iconName) + '</span>' +
+      '<h3>' + esc(title) + '</h3><p>' + esc(detail) + '</p>' +
+      '<a href="#' + target + '">Continue with ' + (target === 'watch' ? 'employer sources' : 'opportunities') +
+         ' ' + context.icon('arrow-right') + '</a></div>';
+  }
+
+  function dateLabel() {
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone:'Asia/Kolkata', weekday:'long', day:'numeric', month:'short', year:'numeric'
+    }).format(new Date());
+  }
+
+  function greeting() {
+    const hour = Number(new Intl.DateTimeFormat('en-GB', {
+      hour:'numeric',timeZone:'Asia/Kolkata'
+    }).format(new Date()));
+    return hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  }
+
+  function searchBox(ctx) {
+    return '<form id="desk-home-search" class="desk-search" role="search">' +
+      '<label for="desk-search-input">' + ctx.icon('search') +
+        '<span class="sr-only">Search internship opportunities</span></label>' +
+      '<input id="desk-search-input" type="search" name="q" autocomplete="off"' +
+        ' placeholder="Try Python backend internship, remote India, AI agents…" aria-label="Search openings">' +
+      '<button type="submit">Search openings ' + ctx.icon('arrow-right') + '</button></form>' +
+      '<div class="desk-preset" role="group" aria-label="Popular searches">' +
+        '<span>Quick searches</span>' +
+        ['Python FastAPI internship', 'Remote backend India', 'AI engineering internship', 'Winter 2026 internship']
+          .map(q => '<button type="button" data-desk-search="' + esc(q) + '">' + esc(q) + '</button>').join('') +
+      '</div>';
+  }
+
+  function quickCount(value, label, caption, href, ico, ctx) {
+    return '<a class="desk-stat" href="' + href + '">' +
+      '<span class="desk-stat-top">' + ctx.icon(ico) + label + '</span>' +
+      '<span class="desk-stat-mid"><strong>' + count(value) + '</strong>' +
+        ctx.icon('arrow-up-right') + '</span>' +
+      '<small>' + caption + '</small></a>';
+  }
+
+  function sectionTitle(eyebrow, title, detail, action, href, ctx) {
+    return '<div class="desk-section-heading"><div>' +
+      '<div class="desk-eyebrow">' + esc(eyebrow) + '</div><h2>' + esc(title) + '</h2>' +
+      '<p>' + esc(detail) + '</p></div>' +
+      (action ? '<a class="desk-inline-link" href="' + href + '">' + action + ' ' +
+        ctx.icon('arrow-right') + '</a>' : '') + '</div>';
+  }
+
+  function deadlineList(events, ctx) {
+    if (!events.length) return '<p class="desk-side-empty">No upcoming deadlines recorded. Unknown cutoff times stay unknown.</p>';
+    return events.slice(0,3).map(event => {
+      const date = event.deadline?.local_date || event.deadline?.date || '';
+      const day = date.slice(8) || '—';
+      const month = date ? ctx.fmt(date,{month:'short'}).replace(/^\d+\s*/, '') : 'Unknown';
+      return '<a class="desk-deadline" href="#calendar">' +
+        '<span class="desk-deadline-date"><b>' + esc(day) + '</b><small>' + esc(month) + '</small></span>' +
+        '<span><strong>' + esc(event.title) + '</strong>' +
+          '<small>' + esc(event.kind || 'Deadline') + (event.deadline?.cutoff_known ?
+            ' · Stated cutoff' : ' · Exact time not stated') + '</small></span>' +
+          ctx.icon('arrow-up-right') + '</a>';
+    }).join('');
+  }
+
+  function actionsPanel(today, match, ctx) {
+    const inbox = (today.priorities || []).find(x => x.kind === 'inbox')?.count || 0;
+    const eligible = count(match.counts?.strong);
+    return '<section class="desk-action-panel">' +
+      '<div class="desk-eyebrow">YOUR NEXT MOVES</div>' +
+      '<h2>Stay one step ahead.</h2>' +
+      '<a href="#matches" class="desk-action"><span class="desk-action-no">01</span><span>' +
+        '<strong>Review best-fit internships</strong><small>' + eligible + ' potential matches from saved sources</small></span>' +
+        ctx.icon('arrow-up-right') + '</a>' +
+      '<a href="#winter" class="desk-action"><span class="desk-action-no">02</span><span>' +
+        '<strong>Check winter internships</strong><small>Verify dates and 2028 eligibility</small></span>' +
+        ctx.icon('arrow-up-right') + '</a>' +
+      '<a href="#inbox" class="desk-action"><span class="desk-action-no">03</span><span>' +
+        '<strong>Review employer messages</strong><small>' + count(inbox) +
+        ' unreviewed recorded signals · not verified interviews</small></span>' +
+        ctx.icon('arrow-up-right') + '</a>' +
+      '<a href="#outreach" class="desk-action"><span class="desk-action-no">04</span><span>' +
+        '<strong>Prepare recruiter outreach</strong><small>Draft and confirm one email at a time</small></span>' +
+        ctx.icon('arrow-up-right') + '</a></section>';
+  }
+
+  function modelNote(model, ctx) {
+    const feedback = count(model?.feedback_records);
+    const required = Math.max(40, count(model?.minimum_distinct_opportunities));
+    const progress = Math.min(100,Math.round(feedback/required*100));
+    return '<section class="desk-model-note"><div class="desk-note-icon">' + ctx.icon('brain') + '</div>' +
+      '<div><strong>Make your matches smarter</strong><p>Rate real roles to build a private relevance model.</p>' +
+      '<div class="desk-progress"><span style="width:' + progress + '%"></span></div>' +
+      '<small>' + feedback + ' / ' + required + ' labeled roles · balanced labels required</small>' +
+      '<a href="#matches">Review matches ' + ctx.icon('arrow-right') + '</a></div></section>';
+  }
+
+  async function renderHome(ticket, ctx) {
+    context = ctx;
+    const [today, analytics, match] = await Promise.all([
+      ctx.api('today'), ctx.api('analytics'), ctx.api('matches')
+    ]);
+    if (ticket !== ctx.getRequest()) return;
+    dataset = match;
+    const items = match.items || [];
+    ctx.remember([...items, ...(today.recommended || []), ...(today.research_first || []),
+      ...(today.recently_discovered || []), ...(today.pinned || [])]);
+    const primary = items.filter(item => item.fit?.level === 'strong').slice(0,4);
+    const suggested = primary.length ? primary : items.slice(0,4);
+    const deadlines = [...(today.deadlines.today || []), ...(today.deadlines.week || []),
+      ...(today.deadlines.month || [])];
+    const fresh = (today.recently_discovered || []).slice(0,3);
+    const $content = document.getElementById('content');
+    $content.innerHTML =
+      '<div class="desk-shell desk-home">' +
+      '<div class="desk-meta"><span><i></i>OPPORTUNITY OS / YOUR CAREER DESK</span>' +
+        '<span>' + esc(dateLabel()) + '</span></div>' +
+      '<div class="desk-welcome">' +
+        '<div><p class="desk-eyebrow">' + greeting() + ', Raj</p>' +
+          '<h1>Make your <em>next move</em> count.</h1>' +
+          '<p>Find relevant internships, check eligibility, and stay ahead of deadlines—all without the noise.</p></div>' +
+        '<div class="desk-welcome-actions">' +
+          '<button type="button" data-action="refresh" class="desk-outline">' + ctx.icon('refresh-cw') +
+             ' Check new openings</button>' +
+          '<a class="desk-main-btn" href="#matches">Explore matches ' +
+             ctx.icon('arrow-up-right') + '</a></div></div>' +
+      '<section class="desk-search-panel">' + searchBox(ctx) + '</section>' +
+      '<section class="desk-stats" aria-label="Your opportunity overview">' +
+        quickCount(match.counts?.strong, 'Worth reviewing', 'Profile-based suggestions', '#matches','sparkles',ctx) +
+        quickCount(match.counts?.winter, 'Winter signals', 'Intake dates need review', '#winter','snowflake',ctx) +
+        quickCount(match.counts?.remote_india_stated, 'India-remote stated', 'Confirm employer work scope', '#matches','globe',ctx) +
+        quickCount(analytics.tracked, 'Tracked applications', 'Not all employer-confirmed', '#applications','briefcase-business',ctx) +
+        '</section>' +
+      '<div class="desk-content-grid"><div class="desk-main-column">' +
+        sectionTitle('01 / MATCHES FOR YOU','Internships worth a closer look',
+          'A short list based on your skills and recorded requirements.', 'See all matches','#matches',ctx) +
+        '<div class="desk-lead-list">' +
+          (suggested.length ? suggested.map(item => lead(item,ctx)).join('') :
+            emptyState('briefcase-business','Your shortlist starts here',
+              'Connect official employer career boards to find internships matching your profile.')) +
+        '</div>' +
+        sectionTitle('02 / NEW FROM YOUR SOURCES','Recently discovered',
+          'These are recorded leads, not confirmed open vacancies.', 'Browse all','#discover',ctx) +
+        '<div class="desk-recent">' +
+        (fresh.length ? fresh.map(item =>
+          '<button type="button" class="desk-recent-row" data-action="detail" data-key="' + esc(item.key) +
+          '"><span class="desk-recent-avatar">' + esc(initial(item.company)) + '</span>' +
+          '<span><strong>' + esc(item.title) + '</strong><small>' + esc(item.company || 'Employer') +
+          ' · ' + esc(item.location || 'Location not stated') + '</small></span>' +
+          ctx.icon('arrow-up-right') + '</button>').join('') :
+          '<p class="desk-side-empty">No newly discovered leads recorded since the last visit.</p>') +
+        '</div></div>' +
+      '<aside class="desk-right-column" aria-label="Next actions and deadlines">' +
+         actionsPanel(today,match,ctx) +
+         '<section class="desk-side-panel"><div class="desk-side-head"><h2>Upcoming deadlines</h2>' +
+           '<a href="#calendar" aria-label="Open calendar">' + ctx.icon('arrow-up-right') + '</a></div>' +
+           deadlineList(deadlines,ctx) + '</section>' +
+         modelNote(match.model,ctx) +
+         '<div class="desk-transparency">' + ctx.icon('shield-check') +
+          '<span>Matches use stored source evidence and explainable rules, not hiring probabilities. ' +
+          'Check the official employer page before applying.</span></div>' +
+      '</aside></div></div>';
+    const saved = document.getElementById('count-saved');
+    if(saved) saved.textContent = today.counts.saved || '';
+    const tracked = document.getElementById('count-applications');
+    if(tracked) tracked.textContent = analytics.tracked || '';
     ctx.mutate('visit').catch(()=>{});
   }
-  function tab(label,key,amount){
-    return '<button type="button" data-match-tab="'+key+'" aria-pressed="'+(activeTab===key)+'"><span>'+safe(label)+'</span><small>'+n(amount)+'</small></button>';
+
+  function optionButton(key,label,total) {
+    return '<button type="button" class="desk-tab" data-match-tab="' + esc(key) + '"' +
+      ' aria-pressed="' + (activeTab === key) + '">' +
+      esc(label) + '<span>' + count(total) + '</span></button>';
   }
-  function matchRows(){
-    if(!latest||!context)return;
-    const all=latest.items||[],t=activeTab;
-    const rows=all.filter(x=>{
-      if(t==='all')return true;
-      if(t==='remote')return x.fit.remote?.india_eligible;
-      if(t==='winter')return /^winter |^possible winter /.test(x.fit.winter||'');
-      return n(x.fit.track_hits?.[t])>0;
-    });
-    const box=document.getElementById('match-results');
-    if(!box)return;
-    box.innerHTML=rows.length?rows.map(x=>fitItem(x,context,'grid')).join(''):emptyCard();
-    document.getElementById('match-result-count').textContent=rows.length+' displayed · '+latest.total+' eligible for review in cached records';
+
+  function inTab(item) {
+    const hits = item.fit?.track_hits || {};
+    if(activeTab === 'all') return true;
+    if(activeTab === 'winter') return winter(item);
+    if(activeTab === 'remote') return Boolean(item.fit?.remote?.india_eligible);
+    return count(hits[activeTab]) > 0;
   }
-  async function renderMatches(ticket,ctx){
-    context=ctx;
-    const data=await ctx.api('matches');
-    if(ticket!==ctx.getRequest())return;
-    latest=data;
-    ctx.remember(data.items||[]);
-    activeTab='all';
-    const feedback=n(data.model?.feedback_records), min=n(data.model?.minimum_distinct_opportunities||40);
-    const activated=(data.model?.models||[]).find(x=>x.status==='active');
-    const cnt=data.counts||{};
-    document.getElementById('content').innerHTML=
-      '<div class="deck-shell match-shell">'+
-        '<div class="deck-utility"><span class="live-indicator"><i></i>YOUR MATCH INTELLIGENCE</span><span>2028 B.Tech · India-first</span></div>'+
-        '<section class="match-hero"><div><div class="deck-section-eyebrow">FIND BETTER, NOT MORE</div><h1>Picked for <em>your path.</em></h1><p>Early-career roles sorted for backend, Python, AI and cloud, with explicit uncertainty about location and employer requirements.</p>'+
-           '<div class="match-head-actions"><a href="#watch" class="deck-action-glass">'+ctx.icon('globe')+' Career-page watchlist</a><button data-action="refresh" class="deck-action-main">'+ctx.icon('refresh-cw')+' Check sources</button></div></div>'+
-           '<div class="match-hero-number"><strong>'+n(data.total)+'</strong><small>possible matches in stored sources</small></div></section>'+
-        '<section class="match-learning"><div><span class="deck-section-eyebrow">PRIVATE RELEVANCE MODEL</span>'+
-          '<h2>'+(activated?'Feedback model active':'Feedback-powered training, when ready')+'</h2>'+
-          '<p>'+(activated?'An evaluated model has been activated. Hard employer eligibility rules still apply.':
-             'The app uses explainable rules now. Record genuine positive and negative role feedback to qualify a model for held-out evaluation.')+'</p></div>'+
-          '<div class="match-learning-side"><div class="match-learning-count">'+feedback+' <span>/ '+min+' labels</span></div>'+
-          '<div class="learning-track"><span style="width:'+Math.min(100,Math.round(feedback/Math.max(min,1)*100))+'%"></span></div>'+
-          (feedback>=min?'<button class="signal-secondary" data-action="evaluate-model">Evaluate feedback model</button>':
-            '<small>Requires '+min+' distinct opportunities and at least 8 positive & 8 negative examples.</small>')+'</div></section>'+
-        '<div class="match-section-head"><div><h2>Explore the signals</h2><p id="match-result-count">Filtering stored employer records…</p></div></div>'+
-        '<div class="match-tabs" role="group" aria-label="Match focus">'+
-          tab('For you','all',data.total)+
-          tab('Backend & Python','backend',data.items.filter(x=>n(x.fit.track_hits.backend)>0).length)+
-          tab('AI engineering','ai',data.items.filter(x=>n(x.fit.track_hits.ai)>0).length)+
-          tab('Cloud & DevOps','cloud',data.items.filter(x=>n(x.fit.track_hits.cloud)>0).length)+
-          tab('India-remote stated','remote',cnt.remote_india_stated)+
-          tab('Winter intake','winter',cnt.winter)+'</div>'+
-        '<div class="match-trust">'+ctx.icon('shield-check')+' <span><strong>Be selective:</strong> “Remote” alone never proves India eligibility. Scores are relevance points, not chances of getting hired. Confirm the official employer listing before applying.</span></div>'+
-        '<div id="match-results" class="match-grid"></div>'+
-        '<footer class="match-end">Showing a ranked shortlist; <a href="#discover">explore all recorded opportunities</a> for broader coverage.</footer>'+
-      '</div>';
-    matchRows();
+
+  function updateResults() {
+    if (!dataset || !context) return;
+    const items = (dataset.items || []).filter(item =>
+      inTab(item) &&
+      (!searchText || [item.title,item.company,item.location,item.extracted?.description]
+        .some(value => String(value || '').toLowerCase().includes(searchText)))
+    );
+    items.sort((a,b) => sortMode === 'recent' ?
+      String(b.first_seen || '').localeCompare(String(a.first_seen || '')) :
+      count(b.fit?.score) - count(a.fit?.score));
+    const target = document.getElementById('desk-match-results');
+    if(!target) return;
+    target.innerHTML = items.length ?
+      items.map(item => lead(item,context,true)).join('') :
+      emptyState('search-x','No matches for these filters',
+        'Try a different track, remove the search term, or explore the full discovery feed.','discover');
+    const label = document.getElementById('desk-result-count');
+    if(label) label.textContent = items.length + ' shown · ' + count(dataset.total) +
+      ' potential matches in stored records';
   }
-  document.addEventListener('click',e=>{
-    const hit=e.target.closest('[data-match-tab]');if(!hit)return;
-    e.preventDefault();activeTab=hit.dataset.matchTab;
-    document.querySelectorAll('[data-match-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b===hit)));
-    matchRows();
+
+  async function renderMatches(ticket,ctx) {
+    context = ctx;
+    const match = await ctx.api('matches');
+    if (ticket !== ctx.getRequest()) return;
+    dataset = match;
+    ctx.remember(match.items || []);
+    activeTab = 'all';
+    sortMode = 'fit';
+    searchText = '';
+    const counts = match.counts || {};
+    const feedback = count(match.model?.feedback_records);
+    const min = count(match.model?.minimum_distinct_opportunities) || 40;
+    const activeModel = (match.model?.models || []).some(m => m.status === 'active');
+    document.getElementById('content').innerHTML =
+      '<div class="desk-shell desk-matches">' +
+       '<div class="desk-meta"><span><i></i>CAREER INTELLIGENCE / RANKED SHORTLIST</span>' +
+         '<span>India-first · graduating 2028</span></div>' +
+       '<section class="desk-match-heading"><div>' +
+         '<p class="desk-eyebrow">MY OPPORTUNITIES</p>' +
+         '<h1>Find your <em>kind of work.</em></h1>' +
+         '<p>Python, backend, AI and cloud internships selected from recorded public job sources. ' +
+           'No inferred employer eligibility is treated as certain.</p></div>' +
+         '<div class="desk-match-heading-actions"><a href="#watch" class="desk-outline">' +
+          ctx.icon('globe') + ' Add employer</a>' +
+          '<button data-action="refresh" class="desk-main-btn">' +
+          ctx.icon('refresh-cw') + ' Refresh sources</button></div></section>' +
+       '<div class="desk-match-summary">' +
+         '<div><strong>' + count(match.total) + '</strong><span>possible roles in source records</span></div>' +
+         '<div><strong>' + count(counts.strong) + '</strong><span>worth reviewing</span></div>' +
+         '<div><strong>' + count(counts.remote_india_stated) + '</strong><span>India-remote stated</span></div>' +
+         '<div><strong>' + count(counts.winter) + '</strong><span>winter-intake signals</span></div></div>' +
+       '<section class="desk-match-controls">' +
+         '<div class="desk-match-search">' + ctx.icon('search') +
+           '<input id="desk-match-input" type="search" placeholder="Find company, technology, or role…" ' +
+           'aria-label="Filter these matches"></div>' +
+         '<label class="desk-sort-label">Sort <select id="desk-match-sort">' +
+           '<option value="fit">Best fit</option><option value="recent">Newest recorded</option></select></label></section>' +
+       '<div class="desk-match-tabs" role="group" aria-label="Filter by career track">' +
+         optionButton('all','For you',match.total) +
+         optionButton('backend','Backend / Python',(match.items||[]).filter(x=>count(x.fit?.track_hits?.backend)).length) +
+         optionButton('ai','AI engineering',(match.items||[]).filter(x=>count(x.fit?.track_hits?.ai)).length) +
+         optionButton('cloud','Cloud / DevOps',(match.items||[]).filter(x=>count(x.fit?.track_hits?.cloud)).length) +
+         optionButton('remote','India-remote stated',counts.remote_india_stated) +
+         optionButton('winter','Winter',counts.winter) + '</div>' +
+       '<div class="desk-match-trust">' + ctx.icon('info') +
+         'Remote does not automatically mean India-eligible. “Fit” describes skill relevance—not your chances of being hired.' +
+         '</div>' +
+       '<div class="desk-results-heading"><h2>Recommended for review</h2>' +
+         '<small id="desk-result-count"></small></div>' +
+       '<div id="desk-match-results" class="desk-match-results"></div>' +
+       '<div class="desk-learning"><div><p class="desk-eyebrow">TRAIN WITH GENUINE FEEDBACK</p>' +
+         '<h2>' + (activeModel ? 'Your evaluated relevance model is active' :
+           'A personalized model needs real examples') + '</h2>' +
+         '<p>Use “Yes” and “Not for me” on individual roles. Once you have enough balanced feedback, ' +
+           'you can evaluate a private ranking model. No email or resume data is used for training.</p></div>' +
+         '<div class="desk-learning-count"><strong>' + feedback + ' / ' + min + '</strong>' +
+         '<div class="desk-progress"><span style="width:' +
+           Math.min(100,Math.round(feedback/Math.max(1,min)*100)) + '%"></span></div>' +
+         (feedback >= min ? '<button type="button" data-action="evaluate-model" class="desk-outline">Evaluate model</button>' :
+           '<small>At least 8 positive and 8 negative examples also required.</small>') + '</div></div>' +
+       '<p class="desk-footer-note">Not seeing a company? <a href="#watch">Add its public career board</a> · ' +
+       '<a href="#discover">Open the full opportunities feed</a></p></div>';
+    updateResults();
+  }
+
+  document.addEventListener('submit', event => {
+    if(event.target?.id !== 'desk-home-search') return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const q = event.target.querySelector('input[name=q]')?.value.trim();
+    if(q && context?.search) context.search(q);
+    else document.getElementById('desk-search-input')?.focus();
+  }, true);
+
+  document.addEventListener('click', event => {
+    const preset = event.target.closest('[data-desk-search]');
+    if(preset) {
+      event.preventDefault();
+      context?.search?.(preset.dataset.deskSearch);
+    }
+    const tab = event.target.closest('[data-match-tab]');
+    if(!tab)return;
+    activeTab = tab.dataset.matchTab;
+    document.querySelectorAll('[data-match-tab]').forEach(button =>
+      button.setAttribute('aria-pressed', String(button === tab)));
+    updateResults();
   });
-  window.MissionControl={renderHome,renderMatches};
+
+  document.addEventListener('input', event => {
+    if(event.target?.id !== 'desk-match-input')return;
+    searchText = event.target.value.trim().toLowerCase();
+    updateResults();
+  });
+
+  document.addEventListener('change', event => {
+    if(event.target?.id !== 'desk-match-sort')return;
+    sortMode = event.target.value === 'recent' ? 'recent' : 'fit';
+    updateResults();
+  });
+
+  window.MissionControl = {renderHome, renderMatches};
 })();
