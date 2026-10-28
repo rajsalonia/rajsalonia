@@ -1,17 +1,26 @@
-# Raj Salonia — Portfolio Website
+# Raj Salonia — Software Engineering Portfolio
 
-Production: https://raj-salonia-portfolio.vercel.app/
+**Live website:** https://raj-salonia-portfolio.vercel.app/
 
-A static HTML/CSS/JavaScript portfolio for backend, cloud, and applied AI engineering. The site has four featured projects (RoofShift AI, JudgeForge, CityGraph, BoloAI), work experience, hackathon qualifications, skills, and contact information.
+This folder contains the current professional portfolio for Raj Salonia, focused on Python backend engineering, FastAPI, cloud, and applied AI.
 
-## Local preview
+## Files
+- `index.html` — responsive portfolio (HTML, CSS and JavaScript, with a self-contained portrait image).
+- `Raj_Salonia_Resume.pdf` — résumé served at `/Raj_Salonia_Resume.pdf` and opened in a new tab.
 
-Open `index.html` in a browser or serve the directory with `python -m http.server 8000`. All project links are external; the résumé is provided as `Raj_Salonia_Resume.pdf`. No build or paid service is required.
+## Site structure
+Hero → About Me → Four Featured Projects → Experience → Hackathons & Recognition → Skills → Contact.
+
+**Featured projects:** RoofShift AI, JudgeForge, CityGraph, and BoloAI.
+
+The site includes a responsive mobile menu, keyboard-accessible case-study dialogs, a copy-email action, reduced-motion support, descriptive page metadata, and clear GitHub / demo / LinkedIn / résumé links.
+
+Hackathon entries distinguish final-round selection, round qualification and participation. No unsupported award count is presented.
 
 ## Publishing
+Keep using the **existing** Vercel project `raj-salonia-portfolio` and its production domain. Deploy `index.html` and `Raj_Salonia_Resume.pdf` together at the site root.
 
-Deploy the directory as a static site on Vercel. Preserve the production project/domain `raj-salonia-portfolio.vercel.app`. Do not upload keys, local `.env` files, or credentials.
+The current Vercel project has been deployed by file upload. Pushing GitHub changes alone is not guaranteed to trigger deployment until Git integration is configured.
 
-## Content accuracy
-
-Engineering metrics refer to documented test or simulated scenarios, not unqualified real-world production outcomes. Hackathon entries distinguish final round, Round 2 and participation; proof links can be added when available.
+## Design approach
+An original design emphasizing readable editorial typography, aligned grids, consistent spacing, restrained visual treatments, and straightforward recruiter navigation. Inspired by general portfolio UX principles without copying other developers' source or assets.
