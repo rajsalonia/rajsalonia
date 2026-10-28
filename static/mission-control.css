@@ -29,6 +29,12 @@
  --desk-orange:#f0c49b;
  --desk-muted:#98a8bc;
  --desk-shadow:0 15px 38px rgba(0,0,0,.09);
+ /* Compatibility tokens for employer watch and winter sections. */
+ --deck-border:var(--desk-border);
+ --deck-panel:var(--desk-panel);
+ --deck-violet:var(--desk-accent);
+ --deck-mint:var(--desk-mint);
+ --deck-glow:var(--desk-shadow);
  --sidebar-width:246px;
 }
 :root[data-theme=light]{
