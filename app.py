@@ -8,6 +8,7 @@ from sqlalchemy import create_engine, text, select, func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError, InterfaceError
 from werkzeug.middleware.proxy_fix import ProxyFix
+from outreach_studio import read_contact_sheet, compose_draft, classify_contact
 
 app=Flask(__name__)
 # Throttle repeated password attempts per worker; proxy IPs are trusted only through Render.
@@ -395,6 +396,10 @@ email_table=Table("email_log",_extra_meta,
  Column("status",String(40)),
  Column("gmail_id",String(320)),
  Column("sent_at",String(50)))
+outreach_exclusions=Table("outreach_exclusions",_extra_meta,
+ Column("email",String(320),primary_key=True),
+ Column("reason",Text),
+ Column("created_at",String(50)))
 source_table=Table("job_sources",_extra_meta,
  Column("id",String(180),primary_key=True),
  Column("provider",String(30)),Column("slug",String(100)),Column("name",String(200)))
@@ -632,41 +637,89 @@ def discovery_auto_refresh():
 def import_hr_contacts():
  check_origin();persistent_only()
  f=request.files.get("file")
- if not f:return {"error":"Upload an XLSX or CSV file"},422
- content=f.read(4_000_001)
- if len(content)>4_000_000:return {"error":"Maximum file size is 4 MB"},413
- filename=(f.filename or "").lower()
- if filename.endswith(".csv"):
-  try: rows=list(csv.DictReader(io.StringIO(content.decode("utf-8-sig"))))
-  except Exception:return {"error":"CSV must be UTF-8"},422
- elif filename.endswith(".xlsx"):
-  from openpyxl import load_workbook
-  try:
-   book=load_workbook(io.BytesIO(content),read_only=True,data_only=True)
-   rows=[]
-   for sheet in book.worksheets:
-    it=sheet.iter_rows(values_only=True)
-    headers=next(it,[])
-    for cells in it:rows.append(dict(zip([str(h or "").strip() for h in headers],cells)))
-    if len(rows)>6000:break
-  except Exception:return {"error":"Invalid Excel workbook"},422
- else:return {"error":"Only .csv and .xlsx files are supported"},422
- inserted=0;skipped=0
+ if not f:return {"error":"Select a CSV or XLSX contact sheet."},422
+ data=f.read(4_000_001)
+ try:parsed=read_contact_sheet(f.filename,data)
+ except ValueError as exc:return {"error":str(exc)},422
+ records=parsed["rows"]
+ with db.connect() as c:
+  known={str(r[0]).lower() for r in c.execute(text("SELECT email FROM contacts"))}
+  avoid={str(r[0]).lower() for r in c.execute(text("SELECT email FROM outreach_exclusions"))}
+ for row in records:
+  row["duplicate"]=row["email"] in known if row["email"] else False
+  row["excluded"]=row["email"] in avoid if row["email"] else False
+  if row["duplicate"]:row["issues"].append("Already imported")
+  if row["excluded"]:row["issues"].append("Do-not-contact list")
+ count_ready=sum(bool(row["ready"] and not row["duplicate"] and not row["excluded"]) for row in records)
+ if request.args.get("preview")=="1":
+  return {"preview":records[:150],"preview_limited":len(records)>150,"total_rows":len(records),
+          "ready":count_ready,"needs_review":sum(not x["ready"] for x in records),
+          "duplicates":sum(x["duplicate"] for x in records),"excluded":sum(x["excluded"] for x in records),
+          "skipped":parsed["skipped"],"capped":parsed["capped"],"method":parsed["method"],
+          "note":"Preview only. Nothing imported or sent. Source columns and recipient identities need owner review."}
+ inserted=0;skipped=parsed["skipped"];need_review=0
  with db.begin() as c:
-  for item in rows[:6000]:
-   lower={str(k or "").lower().strip():str(v or "").strip() for k,v in item.items()}
-   email=next((lower[k] for k in ("email","email id","email-id","emailid","e-mail","email address","hr email","contact email","work email") if lower.get(k)),"").lower()[:250]
-   company=next((lower[k] for k in ("company","company name","organization","employer") if lower.get(k)),"")[:150]
-   if not company or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+",email):
+  for row in records:
+   if not row["ready"]:
+    need_review+=1;continue
+   if row["duplicate"] or row["excluded"]:
     skipped+=1;continue
-   if c.execute(text("SELECT 1 FROM contacts WHERE lower(email)=:email"),{"email":email}).first():
+   # Check inside transaction again: a concurrent import may have inserted this address.
+   if c.execute(text("SELECT 1 FROM contacts WHERE lower(email)=:e"),{"e":row["email"]}).first():
     skipped+=1;continue
    c.execute(text("INSERT INTO contacts(id,company,name,email,role,notes) VALUES(:id,:company,:name,:email,:role,:notes)"),
-    {"id":secrets.token_hex(16),"company":company,"email":email,
-     "name":lower.get("name",lower.get("hr name",""))[:150],
-     "role":lower.get("role","")[:150],"notes":(lower.get("notes") or lower.get("linkedin") or "")[:500]})
+    {"id":secrets.token_hex(16),"company":row["company"],"email":row["email"],
+     "name":row["name"],"role":row["role"],"notes":row["notes"]})
    inserted+=1
- return {"imported":inserted,"skipped":skipped,"total_rows":min(len(rows),6000)}
+ return {"imported":inserted,"skipped":skipped,"needs_review":need_review,"total_rows":len(records),
+         "note":"Contacts imported privately. No drafts or emails were sent."}
+
+@app.get("/api/outreach/contacts")
+def outreach_contacts():
+ owner();persistent_only()
+ with db.connect() as c:
+  rows=[dict(r._mapping) for r in c.execute(text("SELECT id,company,name,email,role,notes FROM contacts ORDER BY company,name LIMIT 3000"))]
+  sent={str(r[0]).lower():(r[1],r[2]) for r in c.execute(text(
+   "SELECT lower(recipient),max(sent_at),count(*) FROM email_log WHERE status='sent' GROUP BY lower(recipient)"))}
+  excluded={str(r[0]).lower() for r in c.execute(text("SELECT email FROM outreach_exclusions"))}
+ for row in rows:
+  category=classify_contact(row)
+  row["classification"]=category
+  row["excluded"]=row["email"].lower() in excluded or category["category"]=="do_not_contact"
+  row["last_sent"],row["sent_count"]=sent.get(row["email"].lower(),(None,0))
+ return {"contacts":rows,"count":len(rows),"model":"explainable rules, not trained ML",
+         "note":"Existing email history here covers only sends recorded through Opportunity OS, not ChatGPT Gmail or external platforms."}
+
+@app.get("/api/outreach/draft/<contact_id>")
+def outreach_contact_draft(contact_id):
+ owner();persistent_only()
+ with db.connect() as c:
+  row=c.execute(text("SELECT company,name,email,role,notes FROM contacts WHERE id=:id"),
+                {"id":contact_id}).mappings().first()
+  if not row:return {"error":"Contact not found."},404
+  if c.execute(text("SELECT 1 FROM outreach_exclusions WHERE email=:email"),{"email":row["email"].lower()}).first():
+   return {"error":"This recipient is on your do-not-contact list."},409
+ try:result=compose_draft(dict(row),season=request.args.get("season","winter"),focus=request.args.get("focus","backend"))
+ except ValueError as exc:return {"error":str(exc)},422
+ result["contact_id"]=contact_id
+ return result
+
+@app.post("/api/outreach/exclusion/<contact_id>")
+def outreach_contact_exclusion(contact_id):
+ check_origin();persistent_only()
+ payload=request.get_json(silent=True) or {}
+ with db.begin() as c:
+  row=c.execute(text("SELECT email FROM contacts WHERE id=:id"),{"id":contact_id}).mappings().first()
+  if not row:return {"error":"Contact not found."},404
+  email=str(row["email"]).lower()
+  if payload.get("excluded") is True:
+   c.execute(text("INSERT INTO outreach_exclusions(email,reason,created_at) VALUES(:e,:r,:at) ON CONFLICT(email) DO UPDATE SET reason=excluded.reason"),
+     {"e":email,"r":"Owner blocked outreach","at":now()})
+  elif payload.get("excluded") is False:
+   c.execute(text("DELETE FROM outreach_exclusions WHERE email=:e"),{"e":email})
+  else:return {"error":"Choose excluded: true or false."},422
+ return {"ok":True,"excluded":payload["excluded"],"note":"Future website sends to blocked recipients are rejected."}
+
 
 @app.post("/api/resume")
 def upload_original_resume():
@@ -853,6 +906,18 @@ def gmail_send_reviewed():
   sent=c.scalar(text("SELECT count(*) FROM email_log WHERE status='sent' AND sent_at LIKE :today"),{"today":today+"%"})
   dupe=c.execute(text("SELECT 1 FROM email_log WHERE recipient=:rec AND subject=:sub AND status='sent'"),
     {"rec":recipient,"sub":subject}).first()
+ with db.connect() as c:
+  blocked=c.execute(text("SELECT 1 FROM outreach_exclusions WHERE email=:e"),{"e":recipient.lower()}).first()
+  previous=c.scalar(text("SELECT max(sent_at) FROM email_log WHERE lower(recipient)=:e AND status='sent'"),
+                    {"e":recipient.lower()})
+ if blocked:return {"error":"Recipient is on the do-not-contact list."},409
+ if classify_contact({"email":recipient})["category"]=="do_not_contact":
+  return {"error":"Automated/no-reply mailboxes are excluded from outreach."},422
+ if previous:
+  try:
+   if (datetime.now(timezone.utc)-datetime.fromisoformat(previous.replace("Z","+00:00"))).days<30:
+    return {"error":"This recipient was emailed within the last 30 days. Review history before another message."},409
+  except (TypeError,ValueError):pass
  if sent>=10:return {"error":"Daily 10-email safety limit reached"},429
  if dupe:return {"error":"This exact email was already sent. Duplicate blocked."},409
  email=EmailMessage()
