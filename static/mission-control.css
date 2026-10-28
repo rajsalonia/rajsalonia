@@ -238,3 +238,11 @@ body::before {
 @media(max-width:740px){body::before{inset:0;height:350px}.deck-shell{padding-top:0}.deck-hero{grid-template-columns:1fr;padding:30px 24px;min-height:auto}.deck-hero h1{letter-spacing:-1.6px}.deck-orbit{display:none}.deck-featured{grid-template-columns:1fr}.deck-side{grid-template-columns:1fr}.deck-side-panel:first-child{grid-column:auto}.match-hero{padding:30px 23px}.match-hero-number{display:none}.match-learning{align-items:flex-start;flex-direction:column}.match-learning-side{max-width:none;width:100%}.match-grid{grid-template-columns:1fr}.deck-metrics{gap:9px}}
 @media(max-width:500px){.deck-utility{font-size:9px}.deck-utility>span:last-child{max-width:44%;text-align:right}.deck-hero{padding:29px 20px}.deck-hero h1{font-size:36px}.deck-hero p{font-size:12px}.deck-hero-foot{gap:11px;margin-top:21px}.deck-hero-actions a{width:100%}.deck-metric{min-height:113px;padding:15px}.deck-metric-top{font-size:10px}.deck-metric>strong{font-size:29px}.deck-metric>small{font-size:9px}.deck-section-head h2{font-size:21px}.deck-section-head p{max-width:200px}.signal-card{padding:17px}.signal-actions>*{flex:1}.signal-actions a,.signal-actions button{text-align:center}.match-tabs button{flex:1 0 auto}.match-hero h1{font-size:36px}.deck-utility{margin:6px 0 12px}}
 @media(prefers-reduced-motion:reduce){.deck-shell{animation:none}.deck-metric,.signal-card,.signal-row,.deck-action-main,.signal-primary,.signal-secondary{transition:none!important;transform:none!important}}
+
+/* Genuine relevance labels feed the private, held-out-evaluated model. */
+.signal-feedback{display:flex;align-items:center;gap:7px;flex-wrap:wrap;border-top:1px solid var(--deck-border);
+ padding-top:12px;margin-top:15px}
+.signal-feedback span{font-size:9px;color:var(--aurora-muted);margin-right:auto}
+.signal-feedback button{border:1px solid var(--deck-border);border-radius:7px;background:var(--aurora-accent-soft);
+ color:var(--aurora-text);font-size:9px;min-height:30px;padding:5px 9px;cursor:pointer}
+.signal-feedback button:hover{border-color:#b6a9ff87;color:var(--deck-violet)}
