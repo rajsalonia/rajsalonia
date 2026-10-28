@@ -41,7 +41,7 @@ def header_index(values):
                 result.setdefault(key, i)
     return result
 
-def read_contact_sheet(filename, content, max_rows=2000):
+def read_contact_sheet(filename, content, max_rows=6000):
     """Return potential contacts and explicit row warnings, with no writes."""
     if len(content) > 4_000_000:
         raise ValueError("Contact file must be 4 MB or smaller.")
