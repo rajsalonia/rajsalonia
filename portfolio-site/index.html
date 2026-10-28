@@ -239,6 +239,79 @@ section[id]{scroll-margin-top:96px}
 @media(max-width:720px){.hero .eyebrow{white-space:normal!important;flex-wrap:wrap!important;gap:7px 10px!important;font-size:9px!important;line-height:1.5!important}.hero .eyebrow-line{display:none!important}.hero .eyebrow>span:last-child{min-width:0;overflow-wrap:break-word}}
 @media(max-width:380px){.hero-heading{font-size:clamp(39px,11.7vw,45px)!important}.hero-buttons{gap:9px!important}.hero-buttons>a{font-size:11px!important}}
 </style>
+<style id="mobile-alignment-fix">
+
+/* Layout fix: stacked responsive experience through tablet/desktop-mode phone widths. */
+@media(max-width:1100px){
+.site-header{height:76px;padding-inline:clamp(18px,3.5vw,32px);gap:16px}
+.brand{gap:12px;min-width:0}.brand-mark{font-size:28px;flex-shrink:0}
+.brand-caption{font-size:11px;white-space:normal;line-height:1.4}.brand-caption small{font-size:9px}
+.nav-links,.nav-cta{display:none!important}
+.menu-toggle{display:block!important;flex:none;width:44px;height:44px;border:1px solid var(--border);border-radius:10px}
+.menu-toggle span{width:22px}.header-actions{gap:10px;flex-shrink:0}
+.mobile-menu{top:76px;max-height:calc(100dvh - 76px);overflow-y:auto}
+.mobile-menu a{font-size:16px;line-height:1.6}
+.network-ribbon-link{display:none!important}
+.section-container{width:min(840px,calc(100% - 64px));margin-inline:auto}
+.section-pad{padding-block:82px}
+.hero{padding-top:130px!important;padding-bottom:50px!important;min-height:0!important}
+.hero-grid{display:flex!important;flex-direction:column;align-items:stretch;min-height:0!important;gap:0!important}
+.hero-copy{width:100%;max-width:none;padding:22px 0 4px!important}
+.hero-microline{font-size:11px;letter-spacing:.08em;line-height:1.6}
+.hero-heading{font-size:clamp(57px,8vw,78px)!important;line-height:1.05!important;letter-spacing:-.065em!important;white-space:normal!important;margin:24px 0 24px!important;max-width:100%;overflow-wrap:normal}
+.hero-description{font-size:17px!important;max-width:650px;line-height:1.75;margin-bottom:25px}
+.hero-buttons{display:flex!important;flex-wrap:wrap!important;gap:14px!important;align-items:center!important;justify-content:flex-start!important}
+.hero-buttons a{max-width:100%}
+.hero-bottom,.hero-trust{margin-top:30px!important;flex-wrap:wrap!important}
+.hero-art{position:relative!important;display:grid!important;visibility:visible!important;opacity:1!important;width:100%;height:290px!important;min-height:0!important;margin:8px auto 0!important;transform:none!important}
+.hero-art .orbital-system{width:310px!important;height:310px!important;max-width:100%!important;aspect-ratio:1;transform:none}
+.hero-art .orb-glow{width:300px;height:300px}
+.hero-art .orb-core{width:168px;height:168px;padding:11px}
+.hero-art .art-corner{display:none!important}
+.hero-art .mini-node{transform:scale(.9)}
+.about-layout{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:33px!important}
+.about-side,.about-main{width:100%!important;min-width:0!important;max-width:none!important}
+.about-side{display:flex;flex-direction:column;align-items:center}
+.about-side>.eyebrow{align-self:stretch;margin-bottom:30px}
+.about-portrait{width:min(355px,82%)!important;max-width:100%!important;margin:0 auto!important}
+.about-main{padding:0!important}
+.about-main h2{font-size:clamp(48px,7vw,65px)!important;line-height:1.08;margin-bottom:20px}
+.about-lead,.about-copy{font-size:17px;line-height:1.7;max-width:730px}
+.about-facts{max-width:730px}
+.projects-grid{grid-template-columns:1fr!important;gap:20px!important}
+.project-card,.project-wide,.project-narrow{grid-column:auto!important;max-width:100%!important;min-width:0!important}
+.section-heading h2{font-size:clamp(43px,6vw,67px)!important;line-height:1.12}
+.section-lede{font-size:16px;line-height:1.7;max-width:700px}
+}
+@media(max-width:720px){
+.site-header{height:66px;padding-inline:18px}
+.brand-caption{display:none}.brand-mark{font-size:26px}
+.header-actions{gap:7px}.header-actions .command-trigger{display:none!important}
+.menu-toggle{width:43px;height:41px}.mobile-menu{top:66px;max-height:calc(100dvh - 66px)}
+.section-container{width:calc(100% - 36px)}.section-pad{padding-block:64px}
+.hero{padding-top:96px!important;padding-bottom:32px!important}
+.hero-copy{padding-top:16px!important}.hero-microline{font-size:9px}
+.hero-heading{font-size:clamp(40px,10vw,66px)!important;line-height:1.06!important;letter-spacing:-.064em!important;margin:17px 0 20px!important}
+.hero-description{font-size:15px!important;line-height:1.65;margin-bottom:20px}
+.hero-buttons{gap:10px!important}.hero-buttons .primary-button{min-width:176px;padding-left:15px}
+.hero-buttons .hero-resume-link{min-width:0}
+.hero-trust{font-size:10px;margin-top:21px!important}
+.hero .hero-art{display:grid!important;visibility:visible!important;opacity:1!important;position:relative!important;height:238px!important;margin:6px auto 0!important}
+.hero-art .orbital-system{width:240px!important;height:240px!important}
+.hero-art .orb-glow{width:230px;height:230px}.hero-art .orb-core{width:142px;height:142px}
+.about-layout{gap:28px!important}.about-side>.eyebrow{margin-bottom:24px}
+.about-portrait{width:min(320px,88%)!important}
+.about-main h2{font-size:clamp(42px,11vw,56px)!important;margin-bottom:16px}
+.about-lead,.about-copy{font-size:15px;line-height:1.7}
+.section-heading h2{font-size:clamp(37px,9vw,53px)!important}.section-lede{font-size:14px}
+}
+@media(max-width:375px){
+.hero-heading{font-size:clamp(36px,11vw,41px)!important}
+.hero-buttons .primary-button{min-width:165px}
+.hero-buttons .hero-resume-link{padding:11px 12px!important}
+.hero-microline{font-size:8px}.eyebrow{white-space:normal!important}
+}
+</style>
 </head>
 <body data-release="portfolio-professional-2026-10"><div aria-hidden="true" id="readingProgress" style="position:fixed;top:0;left:0;width:0;height:2px;z-index:150;background:linear-gradient(90deg,#a48aff,#84f6ed);box-shadow:0 0 12px #a48aff;pointer-events:none;transition:width 80ms linear"></div>
 <a class="skip-link" href="#main">Skip to content</a>
