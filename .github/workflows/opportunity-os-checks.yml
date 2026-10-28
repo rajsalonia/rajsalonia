@@ -17,5 +17,6 @@ jobs:
           node-version: '22'
       - run: node --check static/app.js
       - run: node --check static/workspace.js
+      - run: node --check static/outreach-studio.js
       - run: node --check autofill_companion/popup.js
       - run: python -m pytest -q tests
