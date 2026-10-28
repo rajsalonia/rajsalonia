@@ -678,7 +678,7 @@ def import_hr_contacts():
 def outreach_contacts():
  owner();persistent_only()
  with db.connect() as c:
-  rows=[dict(r._mapping) for r in c.execute(text("SELECT id,company,name,email,role,notes FROM contacts ORDER BY company,name LIMIT 3000"))]
+  rows=[dict(r._mapping) for r in c.execute(text("SELECT id,company,name,email,role,notes FROM contacts ORDER BY company,name LIMIT 6000"))]
   sent={str(r[0]).lower():(r[1],r[2]) for r in c.execute(text(
    "SELECT lower(recipient),max(sent_at),count(*) FROM email_log WHERE status='sent' GROUP BY lower(recipient)"))}
   excluded={str(r[0]).lower() for r in c.execute(text("SELECT email FROM outreach_exclusions"))}
